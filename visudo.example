@@ -1,0 +1,2 @@
+# Allow 'administrator' user to restart uccx-12-5-toolbox-api service
+administrator ALL=NOPASSWD: /bin/systemctl restart uccx-12-5-toolbox-api.service

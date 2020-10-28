@@ -1,0 +1,26 @@
+{
+  "name": "uccx-12-5-toolbox-api",
+  "version": "2020.10.27",
+  "description": "REST API for the dCloud UCCX 12.5 Instant Demo Toolbox",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "NODE_EXTRA_CA_CERTS=certs/ca.pem node src/index"
+  },
+  "repository": "https://github.com/ccondry/uccx-12-5-toolbox-api.git",
+  "author": "Coty Condry <ccondry@cisco.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@ccondry/mongo-wrapper": "^1.5.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-jwt": "^5.3.1",
+    "fast-xml-parser": "^3.17.4",
+    "jsonwebtoken": "^8.5.1",
+    "node-fetch": "^2.6.0",
+    "request-ip": "^2.1.3",
+    "simple-ldap-client": "^2020.10.24-1"
+  },
+  "devDependencies": {}
+}

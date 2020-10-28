@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session>
+  <datacenter>RTP</datacenter>
+  <id>758461</id>
+  <owner>ccondry</owner>
+  <vpod>319</vpod>
+  <anycpwd>0a70f8</anycpwd>
+  <devices>
+    <device>
+      <id>19</id>
+      <name>vcube19</name>
+    </device>
+  </devices>
+  <translations>
+    <translation>
+      <inside>198.18.135.68</inside>
+      <outside>173.38.218.203</outside>
+      <name>RP.vpod319.dc-03.com</name>
+    </translation>
+    <translation>
+      <inside>198.18.133.254</inside>
+      <outside>173.38.218.206</outside>
+      <name></name>
+    </translation>
+  </translations>
+  <dids>
+    <did>
+      <name>DID1</name>
+      <number>+44 118 9162180</number>
+    </did>
+    <did>
+      <name>DID2</name>
+      <number>+44 118 9162181</number>
+    </did>
+    <did>
+      <name>DID3</name>
+      <number>+44 118 9162182</number>
+    </did>
+    <did>
+      <name>DID4</name>
+      <number>+44 118 9162183</number>
+    </did>
+    <did>
+      <name>DID5</name>
+      <number>+44 118 9162184</number>
+    </did>
+    <did>
+      <name>DID6</name>
+      <number>+44 118 9162185</number>
+    </did>
+    <did>
+      <name>DID7</name>
+      <number>+44 118 9162186</number>
+    </did>
+    <did>
+      <name>DID8</name>
+      <number>+44 118 9162187</number>
+    </did>
+    <did>
+      <name>DID9</name>
+      <number>+44 118 9162188</number>
+    </did>
+    <did>
+      <name>DID10</name>
+      <number>+44 118 9162189</number>
+    </did>
+  </dids>
+</session>
