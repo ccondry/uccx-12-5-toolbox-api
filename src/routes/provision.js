@@ -46,4 +46,24 @@ router.post('/', async function (req, res) {
   }
 })
 
+// deprovision user
+router.delete('/', async function (req, res) {
+  try {
+    const username = req.user.username
+    const userId = req.user.id
+    const filter = { $or: [ {username}, {userId} ] }
+    const results = await db.deleteOne('toolbox', 'provision', filter)
+    if (results.ok === 1) {
+      // return OK
+      return res.status(200).send()
+    } else {
+      return res.status(500).send(results)
+    }
+  } catch (e) {
+    // error during processing
+    console.log('failed to deprovision user', req.user.username, `(${req.user.id}):`, e.message)
+    return res.status(500).send({message: e.message})
+  }
+})
+
 module.exports = router
