@@ -53,10 +53,11 @@ router.delete('/', async function (req, res) {
     const userId = req.user.id
     const filter = { $or: [ {username}, {userId} ] }
     const results = await db.deleteOne('toolbox', 'provision', filter)
-    if (results.ok === 1) {
+    if (results.deletedCount === 1) {
       // return OK
       return res.status(200).send()
     } else {
+      console.log('results.deletedCount is not 1. it is ', results.deletedCount)
       return res.status(500).send(results)
     }
   } catch (e) {
