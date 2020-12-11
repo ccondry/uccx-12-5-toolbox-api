@@ -1,6 +1,6 @@
 [Unit]
 # this is the daemon for running the uccx-12-5-toolbox-api REST API node.js service
-Description=GoCMS web portal REST API
+Description=UCCX 12.5 instant demo toolbox REST API
 # make sure we have network connection before starting
 After=network.target
 
