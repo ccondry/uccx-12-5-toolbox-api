@@ -24,6 +24,7 @@ router.get('/', async function (req, res) {
 // provision user
 router.post('/', async function (req, res) {
   try {
+    // TODO build this
     const username = req.user.username
     const userId = req.user.id
     const filter = { $or: [ {username}, {userId} ] }
