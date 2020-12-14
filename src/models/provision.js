@@ -41,8 +41,6 @@ function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-module.exports = provision
-
 // test user ID
 // const userId = '0021'
 const agentPassword = 'C1sco12345'
@@ -1343,3 +1341,5 @@ async function provision (user, password) {
     teamInfo
   }
 }
+
+module.exports = provision
