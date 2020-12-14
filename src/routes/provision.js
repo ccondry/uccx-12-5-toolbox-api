@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const db = require('../models/db')
+const provision = require('../models/provision')
 
 // get provision status
 router.get('/', async function (req, res) {
@@ -21,25 +22,22 @@ router.get('/', async function (req, res) {
   }
 })
 
-// provision user
+// provision user in UCCX, LDAP, CUCM, etc.
 router.post('/', async function (req, res) {
   try {
-    // TODO build this
-    const username = req.user.username
-    const userId = req.user.id
-    const filter = { $or: [ {username}, {userId} ] }
-    const data = {
-      username,
-      userId,
-      vertical: 'travel'
+    // use toolbox username and user ID for account provision
+    const user = {
+      username: req.user.username,
+      id: req.user.id,
+      // default vertical to travel if not provided
+      vertical: req.body.vertical || 'travel'
     }
-    const results = await db.upsert('toolbox', 'provision', filter, data)
-    if (results.ok === 1) {
-      // return OK
-      return res.status(200).send()
-    } else {
-      return res.status(500).send(results)
-    }
+    // user's new RDP and VPN account password
+    const password = req.body.password
+    // go
+    await provision(user, password)
+    // done!
+    return res.status(200).send()
   } catch (e) {
     // error during processing
     console.log('failed to get provision status for', req.user.username, `(${req.user.id}):`, e.message)
