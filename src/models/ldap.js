@@ -56,8 +56,8 @@ function getUser (username) {
 }
 
 function addToGroup ({groupDn, userDn}) {
-  const domain = process.env.LDAP_DOMAIN
   // console.log('request to add LDAP user', userDn, 'to group', groupDn)
+  // const domain = process.env.LDAP_DOMAIN
   return ldap.addToGroup({
     adminDn: process.env.LDAP_ADMIN_DN,
     adminPassword: process.env.LDAP_ADMIN_PASSWORD,
