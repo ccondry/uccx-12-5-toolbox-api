@@ -1,6 +1,6 @@
 {
   "name": "uccx-12-5-toolbox-api",
-  "version": "2020.10.27",
+  "version": "2020.12.15",
   "description": "REST API for the dCloud UCCX 12.5 Instant Demo Toolbox",
   "main": "src/index.js",
   "scripts": {
