@@ -516,7 +516,9 @@ async function provision (user, password) {
       markProvision(userId, {$set: {vpnUserGroup: true}})
       console.log('added', vpnUser.distinguishedName, 'to LDAP group', VPN_USER_GROUP)
     } catch (e) {
-      console.log('failed to add VPN LDAP user', user.username, 'to LDAP group', VPN_USER_GROUP, '. Continuing with provision. Error message was', e)
+      if (!e.message.includes('ENTRY_EXISTS')) {
+        console.log('failed to add VPN LDAP user', user.username, 'to LDAP group', VPN_USER_GROUP, '. Continuing with provision. Error message was', e)
+      }
       // continue
     }
 
@@ -530,7 +532,9 @@ async function provision (user, password) {
         console.log('added', vpnUser.distinguishedName, 'to LDAP group', DOMAIN_ADMINS_USER_GROUP)
         markProvision(userId, {$set: {adminGroup: true}})
       } catch (e) {
-        console.log('failed to add VPN LDAP user', user.username, 'to LDAP group', DOMAIN_ADMINS_USER_GROUP, '. Continuing with provision. Error message was', e)
+        if (!e.message.includes('ENTRY_EXISTS')) {
+          console.log('failed to add VPN LDAP user', user.username, 'to LDAP group', DOMAIN_ADMINS_USER_GROUP, '. Continuing with provision. Error message was', e)
+        }
         // continue
       }
     }
