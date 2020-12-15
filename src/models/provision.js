@@ -15,7 +15,7 @@ const applicationTemplate = require('./templates/application')
 const campaignTemplate = require('./templates/campaign')
 const triggerTemplate = require('./templates/trigger')
 
-// const validate = require('./validate')
+const validate = require('./validate')
 
 const createEmail = require('./create-email')
 const db = require('./db')
@@ -24,15 +24,15 @@ const db = require('./db')
 const teamsLogger = require('./teams-logger')
 
 // validate .env vars
-// validate([
-//   'ldap_lab_users_dn',
-//   'ldap_domain',
-//   'ldap_user_agents_dn',
-//   'LDAP_DIRECTORY',
-//   'UCCX_ADMIN_API_URL',
-//   'ROUTE_PARTITION',
-//   'VPN_USER_GROUP'
-// ])
+validate([
+  'LDAP_LAB_USERS_DN',
+  'LDAP_DOMAIN',
+  'LDAP_USER_AGENTS_DN',
+  'LDAP_DIRECTORY',
+  'UCCX_ADMIN_API_URL',
+  'ROUTE_PARTITION',
+  'VPN_USER_GROUP'
+])
 // constants
 const VPN_USER_GROUP = process.env.VPN_USER_GROUP || 'CN=Demo Admins,CN=Users,DC=dcloud,DC=cisco,DC=com'
 const DOMAIN_ADMINS_USER_GROUP = 'CN=Domain Admins,CN=Users,DC=dcloud,DC=cisco,DC=com'
@@ -180,13 +180,13 @@ function findOrCreateLdapVpnUser (user, password) {
     lastName: user.lastName,
     username: user.username,
     commonName: user.username,
-    // domain: process.env.ldap_domain,
+    // domain: process.env.LDAP_DOMAIN,
     // physicalDeliveryOfficeName: user.id,
     telephoneNumber: '1084' + user.id,
     userId: user.id,
     mail: user.email,
     description: 'VPN account',
-    usersDn: process.env.ldap_lab_users_dn,
+    usersDn: process.env.LDAP_LAB_USERS_DN,
     password: password
   })
 }
@@ -252,16 +252,16 @@ async function findOrCreateAgentLdapUser ({
   telephoneNumber,
   password,
   mail,
-  domain = process.env.ldap_domain,
+  domain = process.env.LDAP_DOMAIN,
   description,
-  usersDn = process.env.ldap_user_agents_dn
+  usersDn = process.env.LDAP_USER_AGENTS_DN
 }) {
   try {
     const user = await ldap.getUser(username)
     if (user) {
       return user
     } else if (password) {
-      console.log('creating LDAP user in group', process.env.ldap_user_agents_dn)
+      console.log('creating LDAP user in group', process.env.LDAP_USER_AGENTS_DN)
       // construct body for request
       const body = {
         firstName,
@@ -272,10 +272,10 @@ async function findOrCreateAgentLdapUser ({
         physicalDeliveryOfficeName: userId,
         telephoneNumber,
         userId,
-        mail: mail || username + '@' + process.env.ldap_domain,
+        mail: mail || username + '@' + process.env.LDAP_DOMAIN,
         usersDn,
         description
-        // memberOf: process.env.ldap_user_agents_dn
+        // memberOf: process.env.LDAP_USER_AGENTS_DN
       }
       // log body without password
       console.log('creating LDAP user. body:', body)
