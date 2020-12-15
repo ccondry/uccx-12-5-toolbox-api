@@ -75,7 +75,7 @@ app.use(urlBase + '/provision', require('./routes/provision'))
 
 // start listening
 app.listen(port, () => {
-  const message = `${environment.name} version ${environment.version} service started on ${environment.hostname}. Listening on port ${port}.`
-  console.log(message)
+  // const message = `${environment.name} version ${environment.version} service started on ${environment.hostname}. Listening on port ${port}.`
+  // console.log(message)
   teamsLogger.log('service started on port ' + port)
 })

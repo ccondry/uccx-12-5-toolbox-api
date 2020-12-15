@@ -46,7 +46,7 @@ async function log (args) {
   }
   
   // log to console now
-  console.log(text)
+  // console.log(text)
 
   // define text prefix for this service
   const datacenter = process.env.DCLOUD_DATACENTER || '(unknown)'
