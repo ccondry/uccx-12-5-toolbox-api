@@ -43,7 +43,7 @@ module.exports = {
 }
 
 function getUser (username) {
-  console.log('request to get user', username)
+  // console.log('request to get user', username)
   const domain = process.env.LDAP_DOMAIN
   const upn = username + '@' + domain
 
@@ -56,8 +56,8 @@ function getUser (username) {
 }
 
 function addToGroup ({groupDn, userDn}) {
-  console.log('request to add LDAP user', userDn, 'to group', groupDn)
   const domain = process.env.LDAP_DOMAIN
+  // console.log('request to add LDAP user', userDn, 'to group', groupDn)
   return ldap.addToGroup({
     adminDn: process.env.LDAP_ADMIN_DN,
     adminPassword: process.env.LDAP_ADMIN_PASSWORD,
@@ -200,7 +200,7 @@ async function changePassword (req, res) {
 
 async function createUser (body) {
   try {
-    console.log('creating LDAP user...')
+    // console.log('creating LDAP user...')
     const adminCreds = {
       adminDn: process.env.LDAP_ADMIN_DN,
       adminPassword: process.env.LDAP_ADMIN_PASSWORD
@@ -214,7 +214,7 @@ async function createUser (body) {
         delete params[key]
       }
     }
-    console.log('creating new LDAP user...')
+    // console.log('creating new LDAP user...')
     // create the user
     try {
       await ldap.createUser(params)
@@ -222,7 +222,7 @@ async function createUser (body) {
     } catch (e) {
       if (e.message.includes('ENTRY_EXISTS')) {
         // continue if ldap account exists
-        console.log('LDAP user already exists. continuing.')
+        // console.log('LDAP user already exists. continuing.')
       } else {
         throw e
       }

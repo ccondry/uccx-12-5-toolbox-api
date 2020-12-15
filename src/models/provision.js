@@ -261,7 +261,7 @@ async function findOrCreateAgentLdapUser ({
     if (user) {
       return user
     } else if (password) {
-      console.log('creating LDAP user in group', process.env.LDAP_USER_AGENTS_DN)
+      // console.log('creating LDAP user in group', process.env.LDAP_USER_AGENTS_DN)
       // construct body for request
       const body = {
         firstName,
@@ -278,7 +278,7 @@ async function findOrCreateAgentLdapUser ({
         // memberOf: process.env.LDAP_USER_AGENTS_DN
       }
       // log body without password
-      console.log('creating LDAP user. body:', body)
+      // console.log('creating LDAP user. body:', body)
       // add password to body
       body.password = password
       // create user
@@ -492,7 +492,7 @@ async function provision (user, password) {
   try {
     // create VPN user in Demo Admins OU
     vpnUser = await findOrCreateLdapVpnUser(user, password)
-    console.log('found or created VPN LDAP user:', vpnUser)
+    // console.log('found or created VPN LDAP user:', vpnUser)
     // add provision info to database
     markProvision(userId, {$set: {vpnUser: true}})
   } catch (e) {
