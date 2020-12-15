@@ -3,16 +3,16 @@ const validate = require('./validate')
 
 // validate .env vars
 validate([
-  'ldap_url',
-  'ldap_domain',
-  'ldap_base_dn',
-  'ldap_admin_password',
-  'ldap_admin_dn'
+  'LDAP_URL',
+  'LDAP_DOMAIN',
+  'LDAP_BASE_DN',
+  'LDAP_ADMIN_PASSWORD',
+  'LDAP_ADMIN_DN'
   // 'ldap_admin_group_dn'
 ])
 
 // set up ldap client
-const ldap = new ldapClient(process.env.ldap_url, process.env.ldap_base_dn)
+const ldap = new ldapClient(process.env.LDAP_URL, process.env.LDAP_BASE_DN)
 
 const attributes = [
   'objectGUID',
@@ -44,12 +44,12 @@ module.exports = {
 
 function getUser (username) {
   console.log('request to get user', username)
-  const domain = process.env.ldap_domain
+  const domain = process.env.LDAP_DOMAIN
   const upn = username + '@' + domain
 
   return ldap.adminGetUser({
-    adminDn: process.env.ldap_admin_dn,
-    adminPassword: process.env.ldap_admin_password,
+    adminDn: process.env.LDAP_ADMIN_DN,
+    adminPassword: process.env.LDAP_ADMIN_PASSWORD,
     upn,
     attributes
   })
@@ -57,10 +57,10 @@ function getUser (username) {
 
 function addToGroup ({groupDn, userDn}) {
   console.log('request to add LDAP user', userDn, 'to group', groupDn)
-  const domain = process.env.ldap_domain
+  const domain = process.env.LDAP_DOMAIN
   return ldap.addToGroup({
-    adminDn: process.env.ldap_admin_dn,
-    adminPassword: process.env.ldap_admin_password,
+    adminDn: process.env.LDAP_ADMIN_DN,
+    adminPassword: process.env.LDAP_ADMIN_PASSWORD,
     userDn,
     groupDn
   })
@@ -70,7 +70,7 @@ function addToGroup ({groupDn, userDn}) {
 //   console.log('get user request for username' + req.body.username)
 //   const username = req.body.username
 //   const password = req.body.password
-//   const domain = process.env.ldap_domain
+//   const domain = process.env.LDAP_DOMAIN
 //   const upn = username + '@' + domain
 //   try {
 //     // attempt authentication with LDAP
@@ -166,8 +166,8 @@ async function resetPassword (req, res) {
     console.log('password reset request received for ' + user)
 
     const adminCreds = {
-      adminDn: process.env.ldap_admin_dn,
-      adminPassword: process.env.ldap_admin_password,
+      adminDn: process.env.LDAP_ADMIN_DN,
+      adminPassword: process.env.LDAP_ADMIN_PASSWORD,
     }
     // mix in credentials with user request data, and send request
     let params = Object.assign({}, adminCreds, req.body)
@@ -202,8 +202,8 @@ async function createUser (body) {
   try {
     console.log('creating LDAP user...')
     const adminCreds = {
-      adminDn: process.env.ldap_admin_dn,
-      adminPassword: process.env.ldap_admin_password
+      adminDn: process.env.LDAP_ADMIN_DN,
+      adminPassword: process.env.LDAP_ADMIN_PASSWORD
     }
     // mix in credentials with user request data, and send request
     let params = Object.assign({}, adminCreds, body)
