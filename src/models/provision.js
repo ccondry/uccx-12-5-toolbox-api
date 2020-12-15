@@ -443,8 +443,14 @@ function getCucmLdapSyncStatus (directory = process.env.LDAP_DIRECTORY) {
 }
 
 // add provision info to database
-function markProvision(userId, query) {
+function createProvision(userId, query) {
   db.upsert('toolbox', 'user.provision', {userId}, query)
+  .catch(e => console.log('failed to create provision database', e.message))
+}
+
+// add provision info to database
+function markProvision(userId, updates) {
+  db.updateOne('toolbox', 'user.provision', {userId}, updates)
   .catch(e => console.log('failed to update provision database', e.message))
 }
 
@@ -452,7 +458,7 @@ function markProvision(userId, query) {
 async function provision (user, password) {
   const userId = user.id
   // add provision info to database
-  markProvision(userId, {
+  createProvision(userId, {
     status: 'working',
     cucmLdapSync: 'not started',
     uccxUserSync: 'not started'
