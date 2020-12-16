@@ -416,7 +416,7 @@ async function findOrCreateTeam (teams, body) {
       console.log('found existing team:', refUrl)
     } else {
       //  team not found - create now
-      console.log('creating team:', JSON.stringify(body, null, 2))
+      console.log(`creating team ${body.teamname}`)
       refUrl = await uccx.team.create(body)
       console.log('successfully created team:', refUrl)
     }
@@ -553,7 +553,7 @@ async function provision (user, password) {
   // start CUCM sync
   doCucmLdapSync()
   .then(r => console.log('CUCM LDAP user sync successfully started'))
-  .catch(e => console.log('CUCM LDAP user sync failed:', e))
+  .catch(e => console.log('CUCM LDAP user sync failed:', e.message))
 
   // find all existing skills and CSQs
   try {
@@ -581,7 +581,7 @@ async function provision (user, password) {
         })
       }
     })
-    console.log('voice info:', voiceInfo)
+    // console.log('voice info:', voiceInfo)
     markProvision(userId, {$set: {voiceCsq: true}})
   } catch (e) {
     console.error('failed to get voice info:', e.message)
@@ -602,7 +602,7 @@ async function provision (user, password) {
       }
     })
     markProvision(userId, {$set: {outboundCsq: true}})
-    console.log('outbound info:', outboundInfo)
+    // console.log('outbound info:', outboundInfo)
   } catch (e) {
     console.error('failed to get voice info:', e.message)
   }
@@ -624,7 +624,7 @@ async function provision (user, password) {
         })
       }
     })
-    console.log('email info:', emailInfo)
+    // console.log('email info:', emailInfo)
     markProvision(userId, {$set: {emailCsq: true}})
     // try {
     //   const supportEmail = accountUserId
@@ -652,7 +652,7 @@ async function provision (user, password) {
       }
     })
     markProvision(userId, {$set: {chatCsq: true}})
-    console.log('chat info:', chatInfo)
+    // console.log('chat info:', chatInfo)
     // let chatCsqId
     // try {
     // get chat CSQ ID
