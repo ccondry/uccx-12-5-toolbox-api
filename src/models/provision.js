@@ -669,16 +669,20 @@ async function provision (user, password) {
 
   // create bubble chat widget
   try {
-    widgetInfo = await findOrCreateChatWidget({
-      name: 'Chat_' + userId,
-      model: chatWidgetTemplate({
-        userId,
-        chatCsqName: 'Chat_' + userId,
-        chatCsqRefUrl: chatInfo.csqRefUrl
+    if (chatInfo.csqRefUrl) {
+      widgetInfo = await findOrCreateChatWidget({
+        name: 'Chat_' + userId,
+        model: chatWidgetTemplate({
+          userId,
+          chatCsqName: 'Chat_' + userId,
+          chatCsqRefUrl: chatInfo.csqRefUrl
+        })
       })
-    })
-    console.log('created chat widget')
-    markProvision(userId, {$set: {chatWidget: true}})
+      console.log('created chat widget')
+      markProvision(userId, {$set: {chatWidget: true}})
+    } else {
+      console.log('bubble chat widget not created - chatInfo.csqRefUrl did not exist. chatInfo was', chatInfo)
+    }
   } catch (e) {
     console.log('failed to create bubble chat widget for', userId, ':', e.message)
     teamsLogger.error(`Failed to create bubble chat widget for ${userId}: ${e.message}`)
