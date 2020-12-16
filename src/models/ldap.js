@@ -222,7 +222,7 @@ async function createUser (body) {
     } catch (e) {
       if (e.message.includes('ENTRY_EXISTS')) {
         // continue if ldap account exists
-        // console.log('LDAP user already exists. continuing.')
+        console.log(`LDAP user ${params.username} already exists in ${params.usersDn}. continuing...`)
       } else {
         throw e
       }
