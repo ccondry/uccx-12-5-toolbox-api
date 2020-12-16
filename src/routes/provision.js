@@ -11,7 +11,7 @@ router.get('/', async function (req, res) {
     // get provision info from local db, matching either username or userId
     const query = { $or: [ {username}, {userId} ] }
     const projection = { _id: 0 }
-    const existing = await db.findOne('toolbox', 'provision', query, {projection})
+    const existing = await db.findOne('toolbox', 'user.provision', query, {projection})
     const body = existing || {}
     // return OK with body
     return res.status(200).send(body)
@@ -51,7 +51,7 @@ router.delete('/', async function (req, res) {
     const username = req.user.username
     const userId = req.user.id
     const filter = { $or: [ {username}, {userId} ] }
-    const results = await db.deleteOne('toolbox', 'provision', filter)
+    const results = await db.deleteOne('toolbox', 'user.provision', filter)
     if (results.deletedCount === 1) {
       // return OK
       return res.status(200).send()
