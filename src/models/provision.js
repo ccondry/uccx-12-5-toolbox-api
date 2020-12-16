@@ -335,7 +335,7 @@ async function findOrCreateSkillAndCsq ({
         // delete the existing one
         await uccx.csq.delete(csq.id)
         // recreate, and set the return value to the new CSQ ref URL
-        csqRefUrl = await uccx.appAdmin.createCsq(csqModel)
+        csqRefUrl = await uccx.csq.create(csqModel)
         console.log('successfully recreated CSQ', csqModel.name, ':', csqRefUrl)
       } else {
         // set the return value to the existing CSQ ref URL
@@ -343,10 +343,10 @@ async function findOrCreateSkillAndCsq ({
       }
     } else {
       // CSQ not found - create now
-      console.log('CSQ not found. Creating CSQ with this model:', JSON.stringify(csqModel, null, 2))
+      console.log(`CSQ ${csqModel.name} not found. Creating now...`)
       // use appAdmin to create CSQ, to get around hard 250 CSQ limit on the
       // normal REST API
-      csqRefUrl = await uccx.appAdmin.createCsq(csqModel)
+      csqRefUrl = await uccx.csq.create(csqModel)
       console.log('successfully created CSQ:', csqRefUrl)
     }
   } catch (e) {
