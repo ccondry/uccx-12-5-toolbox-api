@@ -21,7 +21,7 @@
     "jsonwebtoken": "^8.5.1",
     "node-fetch": "^2.6.0",
     "request-ip": "^2.1.3",
-    "simple-ldap-client": "^2020.10.24-1",
-    "uccx-config-client": "^0.10.4"
+    "simple-ldap-client": "^2020.12.15",
+    "uccx-config-client": "2020"
   }
 }
