@@ -443,9 +443,9 @@ function getCucmLdapSyncStatus (directory = process.env.LDAP_DIRECTORY) {
 }
 
 // add provision info to database
-function createProvision(userId, query) {
-  db.upsert('toolbox', 'user.provision', {userId}, query)
-  .catch(e => console.log('failed to create provision database', e.message))
+function createProvision(userId, data) {
+  db.upsert('toolbox', 'user.provision', {userId}, {...data, userId})
+  .catch(e => console.log('failed to create provision info in database', e.message))
 }
 
 // add provision info to database
@@ -969,10 +969,16 @@ async function provision (user, password) {
       extension: '1082' + userId,
       roles: 'Agent,Supervisor,Reporting'
     })
-
-    console.log('successfully made', 'rbarrows' + userId, 'a supervisor')
-    markProvision(userId, {$set: {rbarrowsSupervisor: true}})
+    // check that it was actually successful
+    const test = await uccx.resource.get('rbarrows' + userId)
+    if (test.type === 2) {
+      console.log('successfully made', 'rbarrows' + userId, 'a supervisor')
+      markProvision(userId, {$set: {rbarrowsSupervisor: true}})
+    } else {
+      throw Error(`user type is ${test.type} after uccx.role.modify(). It should be 2.`)
+    }
   } catch (e) {
+    markProvision(userId, {$set: {rbarrowsSupervisor: false}})
     console.error('failed to make', 'rbarrows' + userId, 'a supervisor')
     teamsLogger.error(`Failed to make rbarrows${userId} a supervisor: ${e.message}`)
   }
