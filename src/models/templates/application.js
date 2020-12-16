@@ -1,5 +1,5 @@
 // get default script name from env vars, or use static default value
-const defaultScript = process.env.DEFAULT_IVR_APPLICATION || 'Main_2018.aef'
+const defaultScript = process.env.DEFAULT_IVR_APPLICATION || 'CumulusInbound.aef'
 module.exports = function ({id, calendarId, name}) {
   console.log('defaultScript is', defaultScript)
   const body = {
