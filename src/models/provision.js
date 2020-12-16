@@ -451,7 +451,7 @@ function createProvision(userId, query) {
 // add provision info to database
 function markProvision(userId, updates) {
   db.updateOne('toolbox', 'user.provision', {userId}, updates)
-  .catch(e => console.log('failed to update provision database', e.message))
+  .catch(e => console.log('failed to update provision info in database', e.message))
 }
 
 // main function
@@ -1035,7 +1035,7 @@ async function provision (user, password) {
     console.log('successfully created team', teamBody.teamname)
     markProvision(userId, {$set: {team: true}})
   } catch (e) {
-    console.error('failed to get team info:', e.message)
+    console.error('failed to get or create team info:', e.message)
   }
 
   // create support email address
