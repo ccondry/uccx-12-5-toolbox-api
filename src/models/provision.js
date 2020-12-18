@@ -93,6 +93,16 @@ async function findOrCreatePhones (userId) {
       username: 'rbarrows' + userId,
       alertingName: 'Rick Barrows'
     })
+    await jabberPhone.create(cucm, {
+      pattern: '1083' + userId,
+      username: 'hliang' + userId,
+      alertingName: 'Helen Liang'
+    })
+    await jabberPhone.create(cucm, {
+      pattern: '1084' + userId,
+      username: 'jabracks' + userId,
+      alertingName: 'James Bracksted'
+    })
   } catch (e) {
     throw e
   }
@@ -107,7 +117,7 @@ function findOrCreateLdapVpnUser (user, password) {
     commonName: user.username,
     // domain: process.env.LDAP_DOMAIN,
     // physicalDeliveryOfficeName: user.id,
-    telephoneNumber: '1084' + user.id,
+    telephoneNumber: '1085' + user.id,
     userId: user.id,
     mail: user.email,
     description: 'VPN account',
@@ -121,6 +131,8 @@ async function findOrCreateLdapUsers (userId) {
   let supervisor
   let agent1
   let agent2
+  let agent3
+  let supervisor2
 
   try {
     supervisor = await findOrCreateAgentLdapUser({
@@ -161,10 +173,38 @@ async function findOrCreateLdapUsers (userId) {
     console.log('failed to find or create LDAP user', 'jopeters' + userId, e.message)
   }
 
+  try {
+    agent3 = await findOrCreateAgentLdapUser({
+      firstName: 'Helen ' + userId,
+      lastName: 'Liang',
+      username: 'hliang' + userId,
+      userId: userId,
+      telephoneNumber: '1083' + userId,
+      password: agentPassword
+    })
+  } catch (e) {
+    console.log('failed to find or create LDAP user', 'hliang' + userId, e.message)
+  }
+
+  try {
+    supervisor2 = await findOrCreateAgentLdapUser({
+      firstName: 'James ' + userId,
+      lastName: 'Bracksted',
+      username: 'jabracks' + userId,
+      userId: userId,
+      telephoneNumber: '1084' + userId,
+      password: agentPassword
+    })
+  } catch (e) {
+    console.log('failed to find or create LDAP user', 'jabracks' + userId, e.message)
+  }
+
   return {
     supervisor,
     agent1,
-    agent2
+    agent2,
+    agent3,
+    supervisor2
   }
 }
 
@@ -401,7 +441,9 @@ async function provision (user, password) {
   let teamInfo = {}
   let agent1
   let agent2
+  let agent3
   let supervisor
+  let supervisor2
   let vpnUser
   let calendarName = 'HolidayCalendar_' + userId
   let calendarId
@@ -464,7 +506,7 @@ async function provision (user, password) {
       }
     }
   }
-  // create LDAP users for sjeffers, jopeters, rbarrows
+  // create LDAP users for sjeffers, jopeters, rbarrows, hliang, jabracks
   try {
     ldapUsers = await findOrCreateLdapUsers(userId)
     console.log('found or created LDAP agent user accounts.')
@@ -664,6 +706,10 @@ async function provision (user, password) {
     markProvision(userId, {$set: {jopetersIpccExtension: true}})
     await setIpccExtension('rbarrows' + userId, '1082' + userId, process.env.ROUTE_PARTITION)
     markProvision(userId, {$set: {rbarrowsIpccExtension: true}})
+    await setIpccExtension('hliang' + userId, '1083' + userId, process.env.ROUTE_PARTITION)
+    markProvision(userId, {$set: {hliangIpccExtension: true}})
+    await setIpccExtension('jabracks' + userId, '1084' + userId, process.env.ROUTE_PARTITION)
+    markProvision(userId, {$set: {jabracksIpccExtension: true}})
   } catch (e) {
     console.log('could not set IPCC extensions for CUCM users:', e.message)
     throw e
@@ -671,7 +717,7 @@ async function provision (user, password) {
 
   let retries = 0
 
-  // try getting agent1 up to maxResourceRetries times
+  // try getting agent1, trying up to "maxResourceRetries" times before throwing error
   while (!agent1 && retries <= maxResourceRetries) {
     try {
       // try to get resource
@@ -759,6 +805,65 @@ async function provision (user, password) {
     throw Error('rbarrows' + userId, 'was not found, even after waiting.')
   }
 
+  // try getting hliang up to maxResourceRetries times
+  retries = 0
+  while (!agent3 && retries <= maxResourceRetries) {
+    try {
+      // try to get resource
+      console.log('trying to find', 'hliang' + userId)
+      agent3 = await uccx.resource.get('hliang' + userId)
+      console.log('hliang' + userId, 'found')
+      break
+    } catch (e) {
+      // failed to get resource
+      if (e.statusCode === 404) {
+        // not found
+        console.log('hliang' + userId, 'not found. waiting 20 seconds and then trying again.')
+        // wait a moment and try again
+        await sleep(resourceRetryDelay)
+        // increment retry counter
+        retries++
+        continue
+      } else {
+        throw e
+      }
+    }
+  }
+
+  if (!agent3) {
+    throw Error('hliang' + userId, 'was not found, even after waiting.')
+  }
+
+
+  // try getting supervisor up to maxResourceRetries times
+  retries = 0
+  while (!supervisor2 && retries <= maxResourceRetries) {
+    try {
+      // try to get resource
+      console.log('trying to find', 'jabracks' + userId)
+      supervisor2 = await uccx.resource.get('jabracks' + userId)
+      console.log('jabracks' + userId, 'found')
+      break
+    } catch (e) {
+      // failed to get resource
+      if (e.statusCode === 404) {
+        // not found
+        console.log('jabracks' + userId, 'not found. waiting 20 seconds and then trying again.')
+        // wait a moment and try again
+        await sleep(resourceRetryDelay)
+        // increment retry counter
+        retries++
+        continue
+      } else {
+        throw e
+      }
+    }
+  }
+
+  if (!supervisor2) {
+    throw Error('jabracks' + userId, 'was not found, even after waiting.')
+  }
+
   markProvision(userId, {$set: {uccxUserSync: 'All agents synced successfully.'}})
 
   // set skill maps
@@ -766,7 +871,7 @@ async function provision (user, password) {
     skillCompetency: []
   }
   try {
-    // set sjeffers skills
+    // set up skill map
     // voice
     if (voiceInfo.skillRefUrl) {
       skillMap.skillCompetency.push({
@@ -887,6 +992,54 @@ async function provision (user, password) {
     // and continue provision
   }
 
+  // update hliang skill map
+  try {
+    agent3.skillMap = skillMap
+    await uccx.resource.modify('hliang' + userId, agent3)
+    console.log('skillMap set for hliang' + userId)
+    markProvision(userId, {$set: {hliangSkillMap: true}})
+  } catch (e) {
+    try {
+      // check for returned API errors
+      const errors = e.response.body.apiError
+      for (const error of errors) {
+        console.error('Failed to set skill map:', error.errorMessage)
+        // send to log events room
+        teamsLogger.error(`Failed to set skill map for hliang${userId}: ${error.errorMessage}`)
+      }
+    } catch (e2) {
+      // just console log it then
+      console.error('failed to set skill map for hliang' + userId, e.message)
+      // and send to log events room
+      teamsLogger.error(`Failed to set skill map for hliang${userId}: ${e.message}`)
+    }
+    // and continue provision
+  }
+
+  // update jabracks skill map
+  try {
+    supervisor2.skillMap = skillMap
+    await uccx.resource.modify('jabracks' + userId, supervisor2)
+    console.log('skillMap set for jabracks' + userId)
+    markProvision(userId, {$set: {jabracksSkillMap: true}})
+  } catch (e) {
+    try {
+      // check for returned API errors
+      const errors = e.response.body.apiError
+      for (const error of errors) {
+        console.error('Failed to set skill map:', error.errorMessage)
+        // send to log events room
+        teamsLogger.error(`Failed to set skill map for jabracks${userId}: ${error.errorMessage}`)
+      }
+    } catch (e2) {
+      // just console log it then
+      console.error('failed to set skill map for jabracks' + userId, e.message)
+      // and send to log events room
+      teamsLogger.error(`Failed to set skill map for jabracks${userId}: ${e.message}`)
+    }
+    // and continue provision
+  }
+
   // modify rick barrows to be a supervisor
   try {
     await uccx.role.modify({
@@ -908,7 +1061,28 @@ async function provision (user, password) {
     teamsLogger.error(`Failed to make rbarrows${userId} a supervisor: ${e.message}`)
   }
 
-  // create Team
+  // modify jabracks to be a supervisor
+  try {
+    await uccx.role.modify({
+      username: 'jabracks' + userId,
+      extension: '1084' + userId,
+      roles: 'Agent,Supervisor,Reporting'
+    })
+    // check that it was actually successful
+    const test = await uccx.resource.get('jabracks' + userId)
+    if (test.type === 2) {
+      console.log('successfully made', 'jabracks' + userId, 'a supervisor')
+      markProvision(userId, {$set: {jabracksSupervisor: true}})
+    } else {
+      throw Error(`user type is ${test.type} after uccx.role.modify(). It should be 2.`)
+    }
+  } catch (e) {
+    markProvision(userId, {$set: {jabracksSupervisor: false}})
+    console.error('failed to make', 'jabracks' + userId, 'a supervisor')
+    teamsLogger.error(`Failed to make jabracks${userId} a supervisor: ${e.message}`)
+  }
+
+  // create Cumulus Team
   try {
     const teamBody = {
       teamname: 'Cumulus_' + userId,
@@ -965,12 +1139,64 @@ async function provision (user, password) {
       })
     }
 
-    // console.log(JSON.stringify(teamBody, null, 2))
     teamInfo = await findOrCreateTeam(teams, teamBody)
     console.log('successfully created team', teamBody.teamname)
-    markProvision(userId, {$set: {team: true}})
+    markProvision(userId, {$set: {team1: true}})
   } catch (e) {
-    console.error('failed to get or create team info:', e.message)
+    console.error('failed to get or create Cumulus team info:', e.message)
+  }
+
+  // create 2Ring Team
+  try {
+    const teamBody = {
+      teamname: '2Ring_' + userId,
+      primarySupervisor: {
+        '@name': 'James Bracksted',
+        refURL: supervisor2.self
+      },
+      resources: {
+        resource: [
+          {
+            '@name': 'James Bracksted',
+            refURL: supervisor2.self
+          },
+          {
+            '@name': 'Helen Liang',
+            refURL: agent3.self
+          }
+        ]
+      },
+      csqs: {
+        csq: []
+      }
+    }
+    // voice
+    if (voiceInfo.csqRefUrl) {
+      teamBody.csqs.csq.push({
+        '@name': 'Voice_' + userId,
+        refURL: voiceInfo.csqRefUrl
+      })
+    }
+    // chat
+    if (chatInfo.csqRefUrl) {
+      teamBody.csqs.csq.push({
+        '@name': 'Chat_' + userId,
+        refURL: chatInfo.csqRefUrl
+      })
+    }
+    // email
+    if (emailInfo.csqRefUrl) {
+      teamBody.csqs.csq.push({
+        '@name': 'Email_' + userId,
+        refURL: emailInfo.csqRefUrl
+      })
+    }
+
+    teamInfo = await findOrCreateTeam(teams, teamBody)
+    console.log('successfully created team', teamBody.teamname)
+    markProvision(userId, {$set: {team2: true}})
+  } catch (e) {
+    console.error('failed to get or create 2Ring team info:', e.message)
   }
 
   // create support email address
