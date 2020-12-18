@@ -4,7 +4,8 @@
   "description": "REST API for the dCloud UCCX 12.5 Instant Demo Toolbox",
   "main": "src/index.js",
   "scripts": {
-    "start": "NODE_EXTRA_CA_CERTS=certs/ca.pem node src/index"
+    "start": "NODE_EXTRA_CA_CERTS=certs/ca.pem node src/index",
+    "test:resource": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/resource"
   },
   "repository": "https://github.com/ccondry/uccx-12-5-toolbox-api.git",
   "author": "Coty Condry <ccondry@cisco.com>",
