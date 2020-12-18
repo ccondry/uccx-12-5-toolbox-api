@@ -3,9 +3,6 @@ const ldap = require('./ldap')
 const cucm = require('./cucm')
 
 const jabberPhone = require('./jabber-phone')
-// const mobileAgentPhone = require('./mobile-agent-phone')
-// const extendAndConnectPhone = require('./extend-and-connect-phone')
-// const camelotPhone = require('./camelot-phone')
 
 const voiceCsqTemplate = require('./templates/voice-csq')
 const emailCsqTemplate = require('./templates/email-csq')
@@ -48,19 +45,8 @@ const agentPassword = 'C1sco12345'
 const maxResourceRetries = 30
 // delay in ms to wait for UCCX to import new resources (agents)
 const resourceRetryDelay = 20000
-// start the provision
-// provision(userId)
-// .then(r => console.log('successfully provisioned user', userId, r))
-// .catch(e => console.error('failed to provision user', userId, e.message))
 
-//
-// findOrCreatePhones(userId)
-// .then(r => console.log('find or create phones successful'))
-// .catch(e => console.error('find or create phones failed', e.message))
 
-// uccx.team.get(4)
-// .then(r => console.log(JSON.stringify(r, null, 2)))
-// .catch(e => console.error(e.message))
 async function setIpccExtension (username, extension, routePartition) {
   try {
     let existing = await cucm.getEndUserIpccExtension(username)
@@ -89,13 +75,6 @@ async function setIpccExtension (username, extension, routePartition) {
   }
 }
 
-// update the demo config for a user
-// function updateDemoConfig (userId, params) {
-//   // return db.upsert('cumulus.config', {userId}, {$set: params})
-//   // send request to toolbox
-//   toolbox.updateDemoConfig(userId, params)
-// }
-
 async function findOrCreatePhones (userId) {
   try {
     // Jabber Phones
@@ -114,60 +93,6 @@ async function findOrCreatePhones (userId) {
       username: 'rbarrows' + userId,
       alertingName: 'Rick Barrows'
     })
-
-    // Mobile Agent Phones
-    // await mobileAgentPhone.create(cucm, {
-    //   lcpPattern: '1090' + userId,
-    //   rcpPattern: '2090' + userId,
-    //   username: 'sjeffers' + userId,
-    //   alertingName: 'Sandra Jefferson'
-    // })
-    // await mobileAgentPhone.create(cucm, {
-    //   lcpPattern: '1091' + userId,
-    //   rcpPattern: '2091' + userId,
-    //   username: 'jopeters' + userId,
-    //   alertingName: 'Josh Peterson'
-    // })
-    // await mobileAgentPhone.create(cucm, {
-    //   lcpPattern: '1092' + userId,
-    //   rcpPattern: '2092' + userId,
-    //   username: 'rbarrows' + userId,
-    //   alertingName: 'Rick Barrows'
-    // })
-    //
-    // // Extend & Connect Phones
-    // await extendAndConnectPhone.create(cucm, {
-    //   pattern: '1060' + userId,
-    //   username: 'sjeffers' + userId,
-    //   alertingName: 'Sandra Jefferson'
-    // })
-    // await extendAndConnectPhone.create(cucm, {
-    //   pattern: '1061' + userId,
-    //   username: 'jopeters' + userId,
-    //   alertingName: 'Josh Peterson'
-    // })
-    // await extendAndConnectPhone.create(cucm, {
-    //   pattern: '1062' + userId,
-    //   username: 'rbarrows' + userId,
-    //   alertingName: 'Rick Barrows'
-    // })
-    //
-    // // Camelot Phones
-    // await camelotPhone.create(cucm, {
-    //   pattern: '1070' + userId,
-    //   username: 'sjeffers' + userId,
-    //   alertingName: 'Sandra Jefferson'
-    // })
-    // await camelotPhone.create(cucm, {
-    //   pattern: '1071' + userId,
-    //   username: 'jopeters' + userId,
-    //   alertingName: 'Josh Peterson'
-    // })
-    // await camelotPhone.create(cucm, {
-    //   pattern: '1072' + userId,
-    //   username: 'rbarrows' + userId,
-    //   alertingName: 'Rick Barrows'
-    // })
   } catch (e) {
     throw e
   }
