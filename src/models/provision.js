@@ -1165,6 +1165,7 @@ async function provision (user, password) {
   try {
     await copyLayoutConfig(cumulusMainTeamId, team1Info.teamId)
     console.log('successfully copied Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id)
+    markProvision(userId, {$set: {team1Layout: true}})
   } catch (e) {
     console.warn('failed to copy Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id, e.message)
   }
@@ -1226,6 +1227,7 @@ async function provision (user, password) {
   try {
     await copyLayoutConfig(cumulus2RingTeamId, team2Info.teamId)
     console.log('successfully copied Finesse Team Layout XML from team', cumulus2RingTeamId, 'to', team2Info.teamId, 'for', user.username, user.id)
+    markProvision(userId, {$set: {team2Layout: true}})
   } catch (e) {
     console.warn('failed to copy Finesse Team Layout XML from team', cumulus2RingTeamId, 'to', team2Info.teamId, 'for', user.username, user.id, e.message)
   }
