@@ -485,6 +485,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {vpnUser: true}})
   } catch (e) {
     console.error('failed to find or create LDAP users', e.message)
+    markProvision(userId, {$set: {vpnUser: false}})
     // fail out
     throw e
   }
@@ -500,6 +501,7 @@ async function provision (user, password) {
     } catch (e) {
       if (!e.message.includes('ENTRY_EXISTS')) {
         console.log('failed to add VPN LDAP user', user.username, 'to LDAP group', VPN_USER_GROUP, '. Continuing with provision. Error message was', e)
+        markProvision(userId, {$set: {vpnUserGroup: false}})
       }
       // continue
     }
@@ -516,6 +518,7 @@ async function provision (user, password) {
       } catch (e) {
         if (!e.message.includes('ENTRY_EXISTS')) {
           console.log('failed to add VPN LDAP user', user.username, 'to LDAP group', DOMAIN_ADMINS_USER_GROUP, '. Continuing with provision. Error message was', e)
+          markProvision(userId, {$set: {adminGroup: false}})
         }
         // continue
       }
@@ -528,6 +531,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {ldapUsers: true}})
   } catch (e) {
     console.error('failed to find or create LDAP users', e.message)
+    markProvision(userId, {$set: {ldapUsers: false}})
     // fail out
     throw e
   }
@@ -567,6 +571,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {voiceCsq: true}})
   } catch (e) {
     console.error('failed to get voice info:', e.message)
+    markProvision(userId, {$set: {voiceCsq: false}})
   }
 
   // generate outbound CSQ data
@@ -587,6 +592,7 @@ async function provision (user, password) {
     // console.log('outbound info:', outboundInfo)
   } catch (e) {
     console.error('failed to get voice info:', e.message)
+    markProvision(userId, {$set: {outboundCsq: false}})
   }
   
   // generate email CSQ data
@@ -618,6 +624,7 @@ async function provision (user, password) {
     // }
   } catch (e) {
     console.error('failed to get email info:', e.message)
+    markProvision(userId, {$set: {emailCsq: false}})
   }
 
   // generate chat CSQ data
@@ -647,6 +654,7 @@ async function provision (user, password) {
     // }
   } catch (e) {
     console.error('failed to get chat info:', e.message)
+    markProvision(userId, {$set: {chatCsq: false}})
   }
 
   // create bubble chat widget
@@ -664,9 +672,11 @@ async function provision (user, password) {
       markProvision(userId, {$set: {chatWidget: true}})
     } else {
       console.log('bubble chat widget not created - chatInfo.csqRefUrl did not exist. chatInfo was', chatInfo)
+      markProvision(userId, {$set: {chatWidget: false}})
     }
   } catch (e) {
     console.log('failed to create bubble chat widget for', userId, ':', e.message)
+    markProvision(userId, {$set: {chatWidget: false}})
     teamsLogger.error(`Failed to create bubble chat widget for ${userId}: ${e.message}`)
   }
 
@@ -696,9 +706,10 @@ async function provision (user, password) {
     }
     // done - provision phones now
     console.log('CUCM LDAP sync is complete. Continuing provision...')
-    markProvision(userId, {$set: {cucmLdapSync: 'completed'}})
+    markProvision(userId, {$set: {cucmLdapSync: true}})
   } catch (e) {
     console.error('failed to complete the CUCM LDAP sync:', e.message)
+    markProvision(userId, {$set: {cucmLdapSync: false}})
     // fail
     throw e
   }
@@ -710,6 +721,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {phones: true}})
   } catch (e) {
     console.log('could not create all agent phones for user ID', userId, e.message)
+    markProvision(userId, {$set: {phones: false}})
     throw e
   }
 
@@ -717,16 +729,45 @@ async function provision (user, password) {
   try {
     await setIpccExtension('sjeffers' + userId, '1080' + userId, process.env.ROUTE_PARTITION)
     markProvision(userId, {$set: {sjeffersIpccExtension: true}})
+  } catch (e) {
+    markProvision(userId, {$set: {sjeffersIpccExtension: false}})
+    console.log('could not set sjeffers IPCC extensions in CUCM:', e.message)
+    throw e
+  }
+  
+  try {
     await setIpccExtension('jopeters' + userId, '1081' + userId, process.env.ROUTE_PARTITION)
     markProvision(userId, {$set: {jopetersIpccExtension: true}})
+  } catch (e) {
+    markProvision(userId, {$set: {jopetersIpccExtension: false}})
+    console.log('could not set jopeters IPCC extensions in CUCM:', e.message)
+    throw e
+  }
+
+  try {
     await setIpccExtension('rbarrows' + userId, '1082' + userId, process.env.ROUTE_PARTITION)
     markProvision(userId, {$set: {rbarrowsIpccExtension: true}})
+  } catch (e) {
+    markProvision(userId, {$set: {rbarrowsIpccExtension: false}})
+    console.log('could not set rbarrows IPCC extensions in CUCM:', e.message)
+    throw e
+  }
+
+  try {
     await setIpccExtension('hliang' + userId, '1083' + userId, process.env.ROUTE_PARTITION)
     markProvision(userId, {$set: {hliangIpccExtension: true}})
+  } catch (e) {
+    markProvision(userId, {$set: {hliangIpccExtension: false}})
+    console.log('could not set hliang IPCC extensions in CUCM:', e.message)
+    throw e
+  }
+
+  try {
     await setIpccExtension('jabracks' + userId, '1084' + userId, process.env.ROUTE_PARTITION)
     markProvision(userId, {$set: {jabracksIpccExtension: true}})
   } catch (e) {
-    console.log('could not set IPCC extensions for CUCM users:', e.message)
+    markProvision(userId, {$set: {jabracksIpccExtension: false}})
+    console.log('could not set jabracks IPCC extensions in CUCM:', e.message)
     throw e
   }
 
@@ -879,7 +920,7 @@ async function provision (user, password) {
     throw Error('jabracks' + userId, 'was not found, even after waiting.')
   }
 
-  markProvision(userId, {$set: {uccxUserSync: 'All agents synced successfully.'}})
+  markProvision(userId, {$set: {uccxUserSync: true}})
 
   // set skill maps
   let skillMap = {
@@ -940,6 +981,7 @@ async function provision (user, password) {
     console.log('skillMap set for sjeffers' + userId)
     markProvision(userId, {$set: {sjeffersSkillMap: true}})
   } catch (e) {
+    markProvision(userId, {$set: {sjeffersSkillMap: false}})
     try {
       // check for returned API errors
       const errors = e.response.body.apiError
@@ -964,6 +1006,7 @@ async function provision (user, password) {
     console.log('skillMap set for jopeters' + userId)
     markProvision(userId, {$set: {jopetersSkillMap: true}})
   } catch (e) {
+    markProvision(userId, {$set: {jopetersSkillMap: false}})
     try {
       // check for returned API errors
       const errors = e.response.body.apiError
@@ -990,6 +1033,7 @@ async function provision (user, password) {
     console.log('skillMap set for rbarrows' + userId)
     markProvision(userId, {$set: {rbarrowsSkillMap: true}})
   } catch (e) {
+    markProvision(userId, {$set: {rbarrowsSkillMap: false}})
     try {
       // check for returned API errors
       const errors = e.response.body.apiError
@@ -1014,6 +1058,7 @@ async function provision (user, password) {
     console.log('skillMap set for hliang' + userId)
     markProvision(userId, {$set: {hliangSkillMap: true}})
   } catch (e) {
+    markProvision(userId, {$set: {hliangSkillMap: false}})
     try {
       // check for returned API errors
       const errors = e.response.body.apiError
@@ -1038,6 +1083,7 @@ async function provision (user, password) {
     console.log('skillMap set for jabracks' + userId)
     markProvision(userId, {$set: {jabracksSkillMap: true}})
   } catch (e) {
+    markProvision(userId, {$set: {jabracksSkillMap: false}})
     try {
       // check for returned API errors
       const errors = e.response.body.apiError
@@ -1160,6 +1206,7 @@ async function provision (user, password) {
     console.log('successfully created team', teamBody.teamname)
     markProvision(userId, {$set: {team1: true}})
   } catch (e) {
+    markProvision(userId, {$set: {team1: false}})
     console.error('failed to get or create Cumulus team info:', e.message)
   }
 
@@ -1169,6 +1216,7 @@ async function provision (user, password) {
     console.log('successfully copied Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id)
     markProvision(userId, {$set: {team1Layout: true}})
   } catch (e) {
+    markProvision(userId, {$set: {team1Layout: false}})
     console.warn('failed to copy Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id, e.message)
   }
 
@@ -1225,6 +1273,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {team2: true}})
   } catch (e) {
     console.error('failed to get or create 2Ring team info:', e.message)
+    markProvision(userId, {$set: {team2: false}})
   }
 
   // set new team's Finesse layout
@@ -1234,6 +1283,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {team2Layout: true}})
   } catch (e) {
     console.warn('failed to copy Finesse Team Layout XML from team', cumulus2RingTeamId, 'to', team2Info.teamId, 'for', user.username, user.id, e.message)
+    markProvision(userId, {$set: {team2Layout: false}})
   }
 
   // create support email address
@@ -1243,6 +1293,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {emailAddress: true}})
   } catch (e) {
     console.log('failed to create support email support_' + userId, e.message)
+    markProvision(userId, {$set: {emailAddress: false}})
   }
 
   // find or create a calendar for rick to manage
@@ -1274,6 +1325,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {calendar: true}})
   } catch (e) {
     console.log('failed to create calendar', calendarName, e.message)
+    markProvision(userId, {$set: {calendar: false}})
   }
 
   // turn on advanced supervisor capabilties for rick
@@ -1297,6 +1349,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {supervisorCapabilities: true}})
   } catch (e) {
     console.log('failed to turn on advanced supervisor capabilities for', supervisorId, e.message)
+    markProvision(userId, {$set: {supervisorCapabilities: false}})
   }
 
   // add the new holiday calendar to the list of calendars managed by rick
@@ -1319,6 +1372,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {calendarCapabilities: true}})
   } catch (e) {
     console.log('failed to add', calendarName, 'to' + supervisorId, 'calendar capabilities', e.message)
+    markProvision(userId, {$set: {calendarCapabilities: false}})
   }
 
   // create an Application for the user, for Rick to manage
@@ -1347,6 +1401,7 @@ async function provision (user, password) {
     }
     markProvision(userId, {$set: {ivrApplication: true}})
   } catch (e) {
+    markProvision(userId, {$set: {ivrApplication: false}})
     console.log('failed to create IVR Application', applicationName, ':', e.message)
   }
 
@@ -1372,6 +1427,7 @@ async function provision (user, password) {
     }
     markProvision(userId, {$set: {applicationTrigger: true}})
   } catch (e) {
+    markProvision(userId, {$set: {applicationTrigger: false}})
     console.log('failed to create Trigger', applicationTrigger, ':', e.message)
   }
 
@@ -1394,6 +1450,7 @@ async function provision (user, password) {
     console.log('successfully added', applicationName, 'to', supervisorId, 'application capabilities')
     markProvision(userId, {$set: {applicationCapabilities: true}})
   } catch (e) {
+    markProvision(userId, {$set: {applicationCapabilities: false}})
     console.log('failed to add', applicationName, 'to' + supervisorId, 'application capabilities', e.message)
   }
 
@@ -1436,6 +1493,7 @@ async function provision (user, password) {
     console.log('successfully enabled outbound on Outbound_' + userId, 'CSQ')
     markProvision(userId, {$set: {outboundCsq: true}})
   } catch (e) {
+    markProvision(userId, {$set: {outboundCsq: false}})
     console.log('failed to enable outbound on Outbound_' + userId, ':', e.message)
   }
 
@@ -1462,6 +1520,7 @@ async function provision (user, password) {
     }
     markProvision(userId, {$set: {outboundCampaign: true}})
   } catch (e) {
+    markProvision(userId, {$set: {outboundCampaign: false}})
     console.log('failed to create outbound agent campaign', agentCampaignName, ':', e.message)
   }
 
@@ -1535,6 +1594,7 @@ async function provision (user, password) {
     console.log('successfully added', agentCampaignName, 'to', supervisorId, 'campaign capabilities')
     markProvision(userId, {$set: {campaignCapabilities: true}})
   } catch (e) {
+    markProvision(userId, {$set: {campaignCapabilities: false}})
     console.log('failed to add', agentCampaignName, 'to', supervisorId, 'campaign capabilities', ':', e.message)
   }
 
