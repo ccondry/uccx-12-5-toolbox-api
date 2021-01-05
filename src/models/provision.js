@@ -446,7 +446,10 @@ async function provision (user, password) {
   const existingCumulusConfig = await db.findOne('toolbox', 'cumulus.config', {userId})
   if (!existingCumulusConfig) {
     // it didn't exist - create it
-    await db.insertOne('toolbox', 'cumulus.config', {userId})
+    await db.insertOne('toolbox', 'cumulus.config', {
+      userId,
+      vertical: 'finance'
+    })
   }
   let ldapUsers
   let skills = []
