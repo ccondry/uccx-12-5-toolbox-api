@@ -1292,8 +1292,14 @@ async function provision (user, password) {
     console.log('successfully created support email support_' + userId)
     markProvision(userId, {$set: {emailAddress: true}})
   } catch (e) {
-    console.log('failed to create support email support_' + userId, e.message)
-    markProvision(userId, {$set: {emailAddress: false}})
+    const regex = /already exists/
+    if (e.message.match(regex)) {
+      console.log(`email address support_${userId} already exists`)
+      markProvision(userId, {$set: {emailAddress: true}})
+    } else {
+      console.log('failed to create support email support_' + userId, e.message)
+      markProvision(userId, {$set: {emailAddress: false}})
+    }
   }
 
   // find or create a calendar for rick to manage
