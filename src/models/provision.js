@@ -437,12 +437,17 @@ function markProvision(userId, updates) {
 async function provision (user, password) {
   const userId = user.id
   // add provision info to database
-  createProvision(userId, {
+  await createProvision(userId, {
     status: 'working',
     cucmLdapSync: 'not started',
     uccxUserSync: 'not started'
   })
-
+  // make sure cumulus.config object exists for this user
+  const existingCumulusConfig = await db.findOne('toolbox', 'cumulus.config', {userId})
+  if (!existingCumulusConfig) {
+    // it didn't exist - create it
+    await db.insertOne('toolbox', 'cumulus.config', {userId})
+  }
   let ldapUsers
   let skills = []
   let csqs = []
