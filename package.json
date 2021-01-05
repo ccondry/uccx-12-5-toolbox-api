@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "NODE_EXTRA_CA_CERTS=certs/ca.pem node src/index",
-    "test:resource": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/resource"
+    "test:resource": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/resource",
+    "test:team": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/team"
   },
   "repository": "https://github.com/ccondry/uccx-12-5-toolbox-api.git",
   "author": "Coty Condry <ccondry@cisco.com>",
@@ -19,6 +20,7 @@
     "express": "^4.17.1",
     "express-jwt": "^5.3.1",
     "fast-xml-parser": "^3.17.4",
+    "finesse-client": "^0.4.1",
     "jsonwebtoken": "^8.5.1",
     "node-fetch": "^2.6.0",
     "request-ip": "^2.1.3",

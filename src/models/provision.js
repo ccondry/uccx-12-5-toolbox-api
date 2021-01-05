@@ -1,6 +1,7 @@
 const uccx = require('./uccx')
 const ldap = require('./ldap')
 const cucm = require('./cucm')
+const finesse = require('./finesse')
 
 const jabberPhone = require('./jabber-phone')
 
@@ -33,6 +34,9 @@ validate([
 // constants
 const VPN_USER_GROUP = process.env.VPN_USER_GROUP || 'CN=Demo Admins,CN=Users,DC=dcloud,DC=cisco,DC=com'
 const DOMAIN_ADMINS_USER_GROUP = 'CN=Domain Admins,CN=Users,DC=dcloud,DC=cisco,DC=com'
+const cumulusMainTeamId = 4
+const cumulus2RingTeamId = 16
+// const cumulusCrmTeamId = 17
 
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -46,6 +50,16 @@ const maxResourceRetries = 30
 // delay in ms to wait for UCCX to import new resources (agents)
 const resourceRetryDelay = 20000
 
+// copy Finesse layout XML config from team ID "from" to team ID "to"
+async function copyLayoutConfig (from, to) {
+  try {
+    // console.log('copying Finesse layout config XML from', from, 'to', to)
+    const layout = await finesse.getFromTeam(from, 'LayoutConfig')
+    await finesse.saveToTeam(to, 'LayoutConfig', layout)
+  } catch (e) {
+    throw e
+  }
+}
 
 async function setIpccExtension (username, extension, routePartition) {
   try {
@@ -438,7 +452,8 @@ async function provision (user, password) {
   let emailInfo = {}
   let chatInfo = {}
   let widgetInfo = {}
-  let teamInfo = {}
+  let team1Info = {}
+  let team2Info = {}
   let agent1
   let agent2
   let agent3
@@ -1139,11 +1154,19 @@ async function provision (user, password) {
       })
     }
 
-    teamInfo = await findOrCreateTeam(teams, teamBody)
+    team1Info = await findOrCreateTeam(teams, teamBody)
     console.log('successfully created team', teamBody.teamname)
     markProvision(userId, {$set: {team1: true}})
   } catch (e) {
     console.error('failed to get or create Cumulus team info:', e.message)
+  }
+
+  // set new team's Finesse layout
+  try {
+    await copyLayoutConfig(cumulusMainTeamId, team1Info.teamId)
+    console.log('successfully copied Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id)
+  } catch (e) {
+    console.warn('failed to copy Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id, e.message)
   }
 
   // create 2Ring Team
@@ -1192,11 +1215,19 @@ async function provision (user, password) {
       })
     }
 
-    teamInfo = await findOrCreateTeam(teams, teamBody)
+    team2Info = await findOrCreateTeam(teams, teamBody)
     console.log('successfully created team', teamBody.teamname)
     markProvision(userId, {$set: {team2: true}})
   } catch (e) {
     console.error('failed to get or create 2Ring team info:', e.message)
+  }
+
+  // set new team's Finesse layout
+  try {
+    await copyLayoutConfig(cumulus2RingTeamId, team2Info.teamId)
+    console.log('successfully copied Finesse Team Layout XML from team', cumulus2RingTeamId, 'to', team2Info.teamId, 'for', user.username, user.id)
+  } catch (e) {
+    console.warn('failed to copy Finesse Team Layout XML from team', cumulus2RingTeamId, 'to', team2Info.teamId, 'for', user.username, user.id, e.message)
   }
 
   // create support email address
@@ -1509,7 +1540,8 @@ async function provision (user, password) {
     emailInfo,
     voiceInfo,
     outboundInfo,
-    teamInfo
+    team1Info,
+    team2Info
   }
 }
 
