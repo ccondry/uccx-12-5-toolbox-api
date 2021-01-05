@@ -641,17 +641,12 @@ async function provision (user, password) {
       }
     })
     markProvision(userId, {$set: {chatCsq: true}})
-    // console.log('chat info:', chatInfo)
-    // let chatCsqId
-    // try {
-    // get chat CSQ ID
-    // chatCsqId = chatInfo.csqRefUrl.split('/').pop()
-    // set chat CSQ ID in user's demo config, for sparky-api to use later
-    // await updateDemoConfig(userId, {chatCsqId})
-    // console.log('successfully updated user demo config with chatCsqId =', chatCsqId)
-    // } catch (e) {
-    //   console.error('failed to get user demo chatCsqId', e.message)
-    // }
+    // copy CSQ ID to cumulus.config
+    await db.updateOne('toolbox', 'cumulus.config', {userId}, {
+      $set: {
+        chatCsqId: chatInfo.csqRefUrl.split('/').pop()
+      }
+    })
   } catch (e) {
     console.error('failed to get chat info:', e.message)
     markProvision(userId, {$set: {chatCsq: false}})
