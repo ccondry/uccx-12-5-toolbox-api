@@ -22,6 +22,10 @@ const exceptions = {
     // this application version
     url: new RegExp(urlBase + '/version', 'i'),
     methods: ['GET']
+  }, {
+    // public REST APIs
+    url: new RegExp(urlBase + '/public', 'i'),
+    methods: ['GET']
   }]
 }
 
@@ -72,6 +76,9 @@ app.use(urlBase + '/user', require('./routes/user'))
 
 // demo environment info
 app.use(urlBase + '/provision', require('./routes/provision'))
+
+// public REST APIs
+app.use(urlBase + '/public', require('./routes/public'))
 
 // start listening
 app.listen(port, () => {
