@@ -1413,7 +1413,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {ivrApplication: false}})
     console.log('failed to create IVR Application', applicationName, ':', e.message)
   }
-
+  let triggerBody
   // find or create trigger for user application
   try {
     try {
@@ -1424,7 +1424,7 @@ async function provision (user, password) {
     } catch (e) {
       // not found
       console.log('creating applicatin Trigger', applicationTrigger, '...')
-      const triggerBody = triggerTemplate({
+      triggerBody = triggerTemplate({
         directoryNumber: applicationTrigger,
         deviceName: applicationTrigger,
         description: applicationName,
@@ -1437,7 +1437,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {applicationTrigger: true}})
   } catch (e) {
     markProvision(userId, {$set: {applicationTrigger: false}})
-    console.log('failed to create Trigger', applicationTrigger, ':', e.message)
+    console.log('failed to create Trigger', applicationTrigger, ':', e.message, triggerBody)
   }
 
   // set the new IVR Application as the list of calendars managed by rick
