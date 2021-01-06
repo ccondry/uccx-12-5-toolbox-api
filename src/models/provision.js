@@ -448,7 +448,7 @@ async function provision (user, password) {
     // it didn't exist - create it
     await db.insertOne('toolbox', 'cumulus.config', {
       userId,
-      vertical: 'finance'
+      vertical: user.vertical || 'travel'
     })
   }
   let ldapUsers
