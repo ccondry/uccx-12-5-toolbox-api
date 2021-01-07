@@ -468,7 +468,10 @@ async function provision (user, password) {
   let supervisor
   let supervisor2
   let vpnUser
-  let calendarName = 'HolidayCalendar_' + userId
+  const calendarName = 'HolidayCalendar_' + userId
+  const voiceCsqName = 'Voice_' + userId
+  const chatCsqName = 'Chat_' + userId
+  const emailCsqName = 'Email_' + userId
   let calendarId
   // supervisor username (ID)
   const supervisorId = 'rbarrows' + userId
@@ -566,10 +569,10 @@ async function provision (user, password) {
     voiceInfo = await findOrCreateSkillAndCsq({
       skills,
       csqs,
-      name: 'Voice_' + userId,
+      name: voiceCsqName,
       getCsqModel: function (skillRefUrl) {
         return voiceCsqTemplate({
-          name: 'Voice_' + userId,
+          name: voiceCsqName,
           userId,
           skillRefUrl
         })
@@ -577,10 +580,10 @@ async function provision (user, password) {
     })
     // console.log('voice info:', voiceInfo)
     markProvision(userId, {$set: {voiceCsq: true}})
-    // copy voice CSQ name to cumulus.config
+    // copy voice CSQ name to user's cumulus.config
     await db.updateOne('toolbox', 'cumulus.config', {userId}, {
       $set: {
-        voiceCsqName: 'Voice_' + userId
+        voiceCsqName
       }
     })
   } catch (e) {
@@ -615,7 +618,7 @@ async function provision (user, password) {
     emailInfo = await findOrCreateSkillAndCsq({
       skills,
       csqs,
-      name: 'Email_' + userId,
+      name: emailCsqName,
       getCsqModel: function (skillRefUrl) {
         return emailCsqTemplate({
           userId,
@@ -646,7 +649,7 @@ async function provision (user, password) {
     chatInfo = await findOrCreateSkillAndCsq({
       skills,
       csqs,
-      name: 'Chat_' + userId,
+      name: chatCsqName,
       getCsqModel: function (skillRefUrl){
         return chatCsqTemplate({
           userId,
@@ -655,7 +658,7 @@ async function provision (user, password) {
       }
     })
     markProvision(userId, {$set: {chatCsq: true}})
-    // copy chat CSQ ID to cumulus.config
+    // copy chat CSQ ID to user's cumulus.config
     await db.updateOne('toolbox', 'cumulus.config', {userId}, {
       $set: {
         chatCsqId: chatInfo.csqRefUrl.split('/').pop()
@@ -670,10 +673,10 @@ async function provision (user, password) {
   try {
     if (chatInfo.csqRefUrl) {
       widgetInfo = await findOrCreateChatWidget({
-        name: 'Chat_' + userId,
+        name: chatCsqName,
         model: chatWidgetTemplate({
           userId,
-          chatCsqName: 'Chat_' + userId,
+          chatCsqName: chatCsqName,
           chatCsqRefUrl: chatInfo.csqRefUrl
         })
       })
@@ -942,7 +945,7 @@ async function provision (user, password) {
       skillMap.skillCompetency.push({
         competencelevel: 5,
         skillNameUriPair: {
-          '@name': 'Voice_' + userId,
+          '@name': voiceCsqName,
           refURL: voiceInfo.skillRefUrl
         }
       })
@@ -952,7 +955,7 @@ async function provision (user, password) {
       skillMap.skillCompetency.push({
         competencelevel: 5,
         skillNameUriPair: {
-          '@name': 'Chat_' + userId,
+          '@name': chatCsqName,
           refURL: chatInfo.skillRefUrl
         }
       })
@@ -962,7 +965,7 @@ async function provision (user, password) {
       skillMap.skillCompetency.push({
         competencelevel: 5,
         skillNameUriPair: {
-          '@name': 'Email_' + userId,
+          '@name': emailCsqName,
           refURL: emailInfo.skillRefUrl
         }
       })
@@ -1183,21 +1186,21 @@ async function provision (user, password) {
     // voice
     if (voiceInfo.csqRefUrl) {
       teamBody.csqs.csq.push({
-        '@name': 'Voice_' + userId,
+        '@name': voiceCsqName,
         refURL: voiceInfo.csqRefUrl
       })
     }
     // chat
     if (chatInfo.csqRefUrl) {
       teamBody.csqs.csq.push({
-        '@name': 'Chat_' + userId,
+        '@name': chatCsqName,
         refURL: chatInfo.csqRefUrl
       })
     }
     // email
     if (emailInfo.csqRefUrl) {
       teamBody.csqs.csq.push({
-        '@name': 'Email_' + userId,
+        '@name': emailCsqName,
         refURL: emailInfo.csqRefUrl
       })
     }
@@ -1256,21 +1259,21 @@ async function provision (user, password) {
     // voice
     if (voiceInfo.csqRefUrl) {
       teamBody.csqs.csq.push({
-        '@name': 'Voice_' + userId,
+        '@name': voiceCsqName,
         refURL: voiceInfo.csqRefUrl
       })
     }
     // chat
     if (chatInfo.csqRefUrl) {
       teamBody.csqs.csq.push({
-        '@name': 'Chat_' + userId,
+        '@name': chatCsqName,
         refURL: chatInfo.csqRefUrl
       })
     }
     // email
     if (emailInfo.csqRefUrl) {
       teamBody.csqs.csq.push({
-        '@name': 'Email_' + userId,
+        '@name': emailCsqName,
         refURL: emailInfo.csqRefUrl
       })
     }
@@ -1338,6 +1341,12 @@ async function provision (user, password) {
       calendarId = newCalendar.split('/').pop()
     }
     markProvision(userId, {$set: {calendar: true}})
+    // copy calendar name to user's cumulus.config
+    await db.updateOne('toolbox', 'cumulus.config', {userId}, {
+      $set: {
+        calendarName
+      }
+    })
   } catch (e) {
     console.log('failed to create calendar', calendarName, e.message)
     markProvision(userId, {$set: {calendar: false}})
@@ -1349,7 +1358,7 @@ async function provision (user, password) {
     await uccx.capabilities.modify(supervisorId, {
       resource: {
         // '@name': 'Rick 0020 Barrows',
-        refURL: 'https://uccx1.dcloud.cisco.com/adminapi/resource/' + supervisorId
+        refURL: process.env.UCCX_ADMIN_API_URL + '/resource/' + supervisorId
       },
       capabilityList: {
         capability: [
@@ -1371,14 +1380,14 @@ async function provision (user, password) {
   try {
     console.log('adding', calendarName, 'to', supervisorId, 'calendar capabilities...')
     await uccx.calendarCapabilities.modify(supervisorId, {
-      "resource": {
-        "refURL": "https://uccx1.dcloud.cisco.com/adminapi/resource/" + supervisorId
+      'resource': {
+        'refURL': process.env.UCCX_ADMIN_API_URL + '/resource/' + supervisorId
       },
-      "calendarList": {
-        "calendar": [
+      'calendarList': {
+        'calendar': [
           {
-            "@name": calendarName,
-            "refURL": "https://uccx1.dcloud.cisco.com/adminapi/calendar/" + calendarId
+            '@name': calendarName,
+            'refURL': process.env.UCCX_ADMIN_API_URL + '/calendar/' + calendarId
           }
         ]
       }
@@ -1402,7 +1411,7 @@ async function provision (user, password) {
     try {
       // try to get application
       console.log('looking for existing IVR Application', applicationName, '...')
-      const application = await uccx.application.get(applicationName)
+      await uccx.application.get(applicationName)
       // application exists
       console.log('IVR Application', applicationName, 'found. Resetting configuration...')
       // overwrite application config
@@ -1435,7 +1444,7 @@ async function provision (user, password) {
         deviceName: applicationTrigger,
         description: applicationName,
         applicationName,
-        applicationRefUrl: 'https://uccx1.dcloud.cisco.com/adminapi/application/' + applicationName
+        applicationRefUrl: process.env.UCCX_ADMIN_API_URL + '/application/' + applicationName
       })
       await uccx.trigger.create(triggerBody)
       console.log('successfully created Trigger', applicationTrigger)
@@ -1450,14 +1459,14 @@ async function provision (user, password) {
   try {
     console.log('adding', applicationName, 'to', supervisorId, 'application capabilities...')
     await uccx.applicationCapabilities.modify(supervisorId, {
-      "resource": {
-        "refURL": "https://uccx1.dcloud.cisco.com/adminapi/resource/" + supervisorId
+      'resource': {
+        'refURL': process.env.UCCX_ADMIN_API_URL + '/resource/' + supervisorId
       },
-      "applicationList": {
-        "application": [
+      'applicationList': {
+        'application': [
           {
-            "@name": applicationName,
-            "refURL": "https://uccx1.dcloud.cisco.com/adminapi/application/" + applicationName
+            '@name': applicationName,
+            'refURL': process.env.UCCX_ADMIN_API_URL + '/application/' + applicationName
           }
         ]
       }
@@ -1477,11 +1486,11 @@ async function provision (user, password) {
     // extract the config object from the single-value array
     const currentConfig = response
     const obData = {
-      "csqNameUriPair": {
-        "@name": 'Outbound_' + userId,
-        "refURL": outboundInfo.csqRefUrl
+      'csqNameUriPair': {
+        '@name': 'Outbound_' + userId,
+        'refURL': outboundInfo.csqRefUrl
       },
-      "percentage": 100
+      'percentage': 100
     }
     // is there already at least 1 CSQ?
     if (currentConfig.assignedCSQs.csq) {
@@ -1590,18 +1599,18 @@ async function provision (user, password) {
   try {
     console.log('adding', agentCampaignName, 'to', supervisorId, 'campaign capabilities...')
     await uccx.campaignCapabilities.modify(supervisorId, {
-      "resource": {
-        "refURL": "https://uccx1.dcloud.cisco.com/adminapi/resource/" + supervisorId
+      'resource': {
+        'refURL': process.env.UCCX_ADMIN_API_URL + '/resource/' + supervisorId
       },
-      "campaignList": {
-        "campaign": [
+      'campaignList': {
+        'campaign': [
           {
-            "@name": agentCampaignName,
-            "refURL": "https://uccx1.dcloud.cisco.com/adminapi/campaign/" + agentCampaignId
+            '@name': agentCampaignName,
+            'refURL': process.env.UCCX_ADMIN_API_URL + '/campaign/' + agentCampaignId
           }
           // {
-          //   "@name": ivrCampaignName,
-          //   "refURL": "https://uccx1.dcloud.cisco.com/adminapi/campaign/" + ivrCampaignId
+          //   '@name': ivrCampaignName,
+          //   'refURL': process.env.UCCX_ADMIN_API_URL + '/campaign/' + ivrCampaignId
           // }
         ]
       }
