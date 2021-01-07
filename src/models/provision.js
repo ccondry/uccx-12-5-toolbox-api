@@ -577,6 +577,12 @@ async function provision (user, password) {
     })
     // console.log('voice info:', voiceInfo)
     markProvision(userId, {$set: {voiceCsq: true}})
+    // copy voice CSQ name to cumulus.config
+    await db.updateOne('toolbox', 'cumulus.config', {userId}, {
+      $set: {
+        voiceCsqName: voiceInfo['@name']
+      }
+    })
   } catch (e) {
     console.error('failed to get voice info:', e.message)
     markProvision(userId, {$set: {voiceCsq: false}})
