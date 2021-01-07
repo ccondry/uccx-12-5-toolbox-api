@@ -655,7 +655,7 @@ async function provision (user, password) {
       }
     })
     markProvision(userId, {$set: {chatCsq: true}})
-    // copy CSQ ID to cumulus.config
+    // copy chat CSQ ID to cumulus.config
     await db.updateOne('toolbox', 'cumulus.config', {userId}, {
       $set: {
         chatCsqId: chatInfo.csqRefUrl.split('/').pop()
