@@ -427,7 +427,7 @@ function createProvision(userId, data) {
   db.upsert('toolbox', 'user.provision', {userId}, dbData)
   .then(results => {
     // successful?
-    if (results.result.ok === 1) {
+    if (results.ok === 1) {
       // successful - add created in epoch seconds (mongo added _id to our data)
       const _id = new db.ObjectID(dbData._id)
       const query = {
