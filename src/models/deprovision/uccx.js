@@ -70,7 +70,7 @@ async function deleteTeams (user) {
     user,
     typeName: 'UCCX teams',
     type: 'team',
-    validTypes: ['Cumulus'],
+    validTypes: ['Cumulus', '2Ring'],
     nameProperty: 'teamname',
     idProperty: 'teamId'
   })
