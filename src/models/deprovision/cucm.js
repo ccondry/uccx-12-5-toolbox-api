@@ -43,7 +43,7 @@ async function deleteJabberLines (user) {
     const prefix = line.pattern.substring(0, 4)
     // return true (include) if line pattern is like 10810325
     for (const v of validPrefixes) {
-      if (prefix === `${v}${user.id}`) {
+      if (line.pattern === `${v}${user.id}`) {
         return true
       }
     }
