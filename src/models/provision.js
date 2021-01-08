@@ -423,12 +423,41 @@ function getCucmLdapSyncStatus (directory = process.env.LDAP_DIRECTORY) {
 
 // add provision info to database
 function createProvision(userId, data) {
-  db.upsert('toolbox', 'user.provision', {userId}, {...data, userId})
+  const dbData = {...data, userId}
+  db.upsert('toolbox', 'user.provision', {userId}, dbData)
+  .then(results => {
+    // successful?
+    if (results.result.ok === 1) {
+      // successful - add created in epoch seconds (mongo added _id to our data)
+      const _id = new db.ObjectID(dbData._id)
+      const query = {
+        // use newly-created object ID that mongo driver appended to our data
+        _id
+      }
+      // append created in epoch seconds, using the timestamp found in db _id
+      // and set modified time
+      const changes = {
+        $set: {
+          created: new Date(_id.getTimestamp().getTime())
+        },
+        $currentDate: {
+          modified: { $type: 'date' }
+        }
+      }
+      db.updateOne('toolbox', 'user.provision', query, changes).catch(e => {})
+    } else {
+      // failed - do nothing, let results be returned
+    }
+  })
   .catch(e => console.log('failed to create provision info in database', e.message))
 }
 
 // add provision info to database
 function markProvision(userId, updates) {
+  // add modified timestamp
+  updates['$currentDate'] = {
+    modified: { $type: 'date' }
+  }
   db.updateOne('toolbox', 'user.provision', {userId}, updates)
   .catch(e => console.log('failed to update provision info in database', e.message))
 }
