@@ -34,9 +34,9 @@ router.post('/', async function (req, res) {
     // user's new RDP and VPN account password
     const password = req.body.password
     // go
-    await provision(user, password)
-    // done!
-    return res.status(200).send()
+    provision(user, password)
+    // accepted
+    return res.status(202).send()
   } catch (e) {
     // error during processing
     console.log('failed to get provision status for', req.user.username, `(${req.user.id}):`, e.message)
