@@ -200,5 +200,6 @@ module.exports = {
   deleteApplications,
   deleteCalendars,
   deleteTriggers,
-  deleteCampaigns
+  deleteCampaigns,
+  lib: uccx
 }

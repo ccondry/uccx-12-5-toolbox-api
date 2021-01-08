@@ -117,5 +117,6 @@ module.exports = {
   listPhones,
   listLines,
   deleteJabberPhones,
-  deleteJabberLines
+  deleteJabberLines,
+  lib: cucm
 }
