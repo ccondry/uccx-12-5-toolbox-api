@@ -445,7 +445,9 @@ function createProvision(userId, data) {
           modified: { $type: 'date' }
         }
       }
-      db.updateOne('toolbox', 'user.provision', query, changes).catch(e => {})
+      db.updateOne('toolbox', 'user.provision', query, changes)
+      .then(r => console.log('added created date to user provision info during createProvision'))
+      .catch(e => console.log('failed to add created date to user provision info during createProvision'))
     } else {
       // failed - do nothing, let results be returned
     }
