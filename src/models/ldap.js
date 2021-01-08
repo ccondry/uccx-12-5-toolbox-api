@@ -39,7 +39,9 @@ module.exports = {
   resetPassword,
   changePassword,
   createUser,
-  addToGroup
+  addToGroup,
+  listUsers,
+  deleteUsers
 }
 
 function getUser (username) {
@@ -236,5 +238,62 @@ async function createUser (body) {
   } catch (error) {
     console.log('failed to create LDAP user:', error.message)
     throw error
+  }
+}
+
+async function listUsers ({
+  attributes = [
+    'name',
+    'sAMAccountName',
+    'memberOf',
+    'primaryGroupID',
+    'description',
+    'physicalDeliveryOfficeName',
+    'distinguishedName',
+    'mail',
+    'userPrincipalName',
+    'whenChanged',
+    'whenCreated'
+  ],
+  filter = '(&(objectClass=user)(objectcategory=person))',
+  searchDn
+}) {
+  const ldapUsers = await ldap.listUsers({
+    adminDn: process.env.LDAP_ADMIN_DN,
+    adminPassword: process.env.LDAP_ADMIN_PASSWORD,
+    filter,
+    attributes,
+    searchDn
+  })
+  // return results
+  return ldapUsers
+}
+
+async function deleteUsers (users) {
+  const success = []
+  const failed = []
+  for (const user of users) {
+    const username = user.sAMAccountName
+    // console.log('deleting LDAP user', username, '...')
+    try {
+      await ldap.deleteUser({
+        adminDn: process.env.LDAP_ADMIN_DN,
+        adminPassword: process.env.LDAP_ADMIN_PASSWORD,
+        userDn: user.distinguishedName
+      })
+      console.log('successfully deleted LDAP user', username)
+      // add to list of deleted users
+      success.push(username)
+      continue
+    } catch (e) {
+      console.log('failed to delete LDAP user', username, e.message)
+      failed.push(username)
+      continue
+    }
+  }
+  // return results
+  return {
+    success,
+    failed
   }
 }

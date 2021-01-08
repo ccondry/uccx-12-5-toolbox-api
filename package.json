@@ -7,7 +7,8 @@
     "start": "NODE_EXTRA_CA_CERTS=certs/ca.pem node src/index",
     "test:resource": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/resource",
     "test:team": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/team",
-    "test:trigger": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/trigger"
+    "test:trigger": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/trigger",
+    "test:deprovision": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/deprovision"
   },
   "repository": "https://github.com/ccondry/uccx-12-5-toolbox-api.git",
   "author": "Coty Condry <ccondry@cisco.com>",
