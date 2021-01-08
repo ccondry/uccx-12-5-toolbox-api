@@ -426,23 +426,16 @@ function createProvision(userId, data) {
   const dbData = {...data, userId}
   db.upsert('toolbox', 'user.provision', {userId}, dbData)
   .then(results => {
-    console.log('createProvision results:', results)
+    // console.log('createProvision results:', results)
     // successful?
-    if (results.ok === 1) {
-      let _id
-      if (results.lastErrorObject.updatedExisting) {
-        // updated
-        _id = new db.ObjectID(results.value._id)
-      } else {
-        // created
-        _id = new db.ObjectID(results.lastErrorObject.upserted)
-      }
+    if (results.ok === 1 && !results.lastErrorObject.updatedExisting) {
+      const _id = new db.ObjectID(results.lastErrorObject.upserted)
       // successful - add created in epoch seconds (mongo added _id to our data)
       const query = {
         // use newly-created object ID that mongo driver appended to our data
         _id
       }
-      console.log('createProvision update query:', query)
+      // console.log('createProvision update query:', query)
       // append created in epoch seconds, using the timestamp found in db _id
       // and set modified time
       const changes = {
