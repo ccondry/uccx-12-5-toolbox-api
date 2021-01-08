@@ -71,7 +71,7 @@ async function checkMaxProvision () {
     // this will sort records with [0] being oldest and [length - 1] being newest
     const sort = {modified: 1}
     const existingUsers = await db.find('toolbox', 'user.provision', {}, projection, sort)
-    console.log('existing users in provision db:', existingUsers)
+    // console.log('existing users in provision db:', existingUsers)
     if (existingUsers.length >= maxUsers) {
       // too many users provisioned. deprovision the oldest 3 now.
       console.log('too many users provisioned. deprovisioning the oldest 3 now...')
