@@ -1250,7 +1250,10 @@ async function provision (user, password) {
     markProvision(userId, {$set: {team1: false}})
     console.error('failed to get or create Cumulus team info:', e.message)
   }
-
+  
+  // wait for the team to sync to finesse
+  await sleep(5000)
+  
   // set new team's Finesse layout
   try {
     await copyLayoutConfig(cumulusMainTeamId, team1Info.teamId)
