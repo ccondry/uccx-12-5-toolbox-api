@@ -25,10 +25,9 @@ router.get('/', async function (req, res) {
 // provision user in UCCX, LDAP, CUCM, etc.
 router.post('/', async function (req, res) {
   try {
-    // use toolbox username and user ID for account provision
+    // use toolbox user info for account provision
     const user = {
-      username: req.user.username,
-      id: req.user.id,
+      ...req.user, 
       // default vertical to travel if not provided
       vertical: req.body.vertical || 'travel'
     }
