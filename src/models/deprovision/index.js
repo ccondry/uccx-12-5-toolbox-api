@@ -43,6 +43,8 @@ async function uccxSync (user, username) {
 }
 
 module.exports = async function (user) {
+  // make sure user.id is set
+  user.id = user.id || user.userId
   try {
     // delete LDAP accounts
     console.log('delete demo agents:', await ldap.deleteDemoUsers(user))
@@ -74,7 +76,6 @@ module.exports = async function (user) {
     // delete user cumulus config info
     await db.deleteOne('toolbox', 'cumulus.config', {userId: user.id})
     console.log('deleted user branding config info from database')
-    process.exit(0)
   } catch (e) {
     console.log(e)
   }
