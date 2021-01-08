@@ -422,8 +422,8 @@ function getCucmLdapSyncStatus (directory = process.env.LDAP_DIRECTORY) {
 }
 
 // add provision info to database
-function createProvision(userId, data) {
-  const dbData = {...data, userId}
+function createProvision(userId, username, data) {
+  const dbData = {...data, userId, username}
   db.upsert('toolbox', 'user.provision', {userId}, dbData)
   .then(results => {
     // successful?
@@ -492,7 +492,7 @@ async function provision (user, password) {
   }
   const userId = user.id
   // add provision info to database
-  await createProvision(userId, {
+  await createProvision(userId, user.username, {
     status: 'working',
     cucmLdapSync: 'not started',
     uccxUserSync: 'not started'
