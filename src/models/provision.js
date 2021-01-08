@@ -479,6 +479,7 @@ async function provision (user, password) {
   try {
     const maxUsers = parseInt(process.env.MAX_USERS || 75)
     const projection = {_id: 1, created: 1, modified: 1, userId: 1}
+    // this will sort records with [0] being oldest and [length - 1] being newest
     const sort = {modified: 1}
     const existingUsers = await db.find('toolbox', 'user.provision', {}, projection, sort)
     console.log('existing users in provision db:', existingUsers)
