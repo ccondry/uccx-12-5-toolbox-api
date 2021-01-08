@@ -34,34 +34,24 @@ async function deleteJabberLines (user) {
     throw e
   }
 
-  // filter phones to just the provision generated ones for this user
+  // valid prefixes for our agents
+  const validPrefixes = ['1080', '1081', '1082', '1083', '1084']
+
+  // filter phones to just the provision generated ones
   const filteredLines = lines.filter(line => {
-    const pattern = line.pattern
-    // line pattern should be 8 characters
-    // 10800325
-    if (pattern.length !== 8) {
-      console.log('skip', pattern)
-      return false
+    // prefix for the current line
+    const prefix = line.pattern.substring(0, 4)
+    // return true (include) if line pattern is like 10810325
+    for (const v of validPrefixes) {
+      if (prefix === `${v}${user.id}`) {
+        return true
+      }
     }
-    const prefix = pattern.substring(0, 4)
-    const prefixes = ['1080', '1081', '1082']
-    // const suffix = pattern.substring(4)
-
-    if (!prefixes.includes(prefix)) {
-      console.log('skip', pattern)
-      return false
-    }
-
-    // match phone number suffix to user ID
-    const suffix = pattern.substring(4)
-    if (suffix !== String(user.id)) {
-      return false
-    }
-
-    return true
+    // filter out if it didn't match our list of expected patterns
+    return false
   })
 
-  // delete phones
+  // delete lines
   for (const line of filteredLines) {
     try {
       await cucm.removeLine({
@@ -94,25 +84,16 @@ async function deleteJabberPhones (user) {
 
   // filter phones to just the provision generated ones
   const filteredPhones = phones.filter(phone => {
-    const name = phone.name
-
-    // phone name should be 15 characters
-    // CSFRBARROWS0000
-    if (name.length !== 15) {
-      console.log('skip', name)
-      return false
+    // list of agents with a jabber phone
+    const agents = ['rbarrows', 'sjeffers', 'jopeters', 'hliang', 'jabracks']
+    // return true (include) if phone name is like CSFRBARROWS0325
+    for (const agent of agents) {
+      if (phone.name === `CSF${agent.toUpperCase()}${user.id}`) {
+        return true
+      }
     }
-
-    // const prefix = name.substring(0, 11)
-    const suffix = name.substring(12)
-
-    // return true if suffix is a number and matches user's 4-digit ID
-    if (isNaN(suffix) || suffix !== String(user.id)) {
-      console.log('skip', name)
-      return false
-    } else {
-      return true
-    }
+    // filter out if it didn't match our list of expected names
+    return false
   })
 
   // delete phones

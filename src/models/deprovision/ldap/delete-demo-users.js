@@ -1,12 +1,12 @@
 const ldap = require('../../ldap')
 
 module.exports = async function (user) {
-  const skipped = []
-  console.log(`getting ldap demo users for ${user.username} ${user.id}...`)
+  // const skipped = []
+  // console.log(`getting ldap demo users for ${user.username} ${user.id}...`)
   const ldapUsers = await ldap.listUsers({
     searchDn: process.env.LDAP_USER_AGENTS_DN
   })
-  console.log('successfully got', ldapUsers.length, 'ldap users in', process.env.LDAP_USER_AGENTS_DN)
+  // console.log('successfully got', ldapUsers.length, 'ldap users in', process.env.LDAP_USER_AGENTS_DN)
 
   // filter users to the ones we want to delete
   const users = ldapUsers.filter(u => {
@@ -39,7 +39,7 @@ module.exports = async function (user) {
   // return results
   return {
     success,
-    failed,
-    skipped
+    failed
+    // skipped
   }
 }

@@ -6,13 +6,12 @@ async function deleteTriggers (user) {
   const nameProperty = 'directoryNumber'
   const idProperty = 'directoryNumber'
 
-  const skipped = []
   const success = []
   const fail = []
 
-  console.log(`listing ${typeName} for ${user.username} ${user.id}...`)
+  // console.log(`listing ${typeName} for ${user.username} ${user.id}...`)
   const items = await uccx[type].list()
-  console.log('found', items.length, typeName, items[0])
+  // console.log('found', items.length, typeName, items[0])
 
   // filter triggers to the one for this user
   const filtered = items.filter(item => item[nameProperty] === '2' + user.id)
@@ -29,7 +28,6 @@ async function deleteTriggers (user) {
   }
   return {
     success,
-    skipped,
     fail
   }
 }
@@ -105,21 +103,29 @@ async function deleteChatWidgets (user) {
   //   type: 'chatWidget',
   //   validTypes: ['Chat']
   // })
-
+  const success = []
+  const fail = []
   // get list of chat widgets from appAdmin web UI
-  console.log(`listing bubble chat widgets...`)
+  // console.log(`listing bubble chat widgets...`)
   const items = await uccx.appAdmin.chatWidget.list()
-  console.log('found', items.length, 'bubble chat widgets')
+  // console.log('found', items.length, 'bubble chat widgets')
   const filtered = items.filter(v => v.name === `Chat_${user.id}`)
   // for each chat widget
   for (const item of filtered) {
     // delete chat widget using appAdmin web UI
     try {
       await uccx.appAdmin.chatWidget.delete(item.id)
+      success.push(item.name)
       console.log('successfully deleted bubble chat widget', item.name, `(${item.id})`)
     } catch (e) {
+      fail.push(item.name)
       console.log('failed to delete bubble chat widget', item.name, `(${item.id})`)
     }
+  }
+  
+  return {
+    success,
+    fail
   }
 }
 
@@ -132,34 +138,34 @@ async function deleteItems ({
   idProperty = 'id',
   nameParts = 2
 }) {
-  const skipped = []
+  // const skipped = []
   const success = []
   const fail = []
 
-  console.log(`listing ${typeName} for ${user.username} ${user.id}...`)
+  // console.log(`listing ${typeName} for ${user.username} ${user.id}...`)
   const items = await uccx[type].list()
-  console.log('found', items.length, typeName, items[0])
+  // console.log('found', items.length, typeName, items[0])
   // console.log('found', items.length, typeName, items)
 
   const filtered = items.filter(item => {
     const parts = item[nameProperty].split('_')
     // valid name has 2 parts
     if (parts.length !== nameParts) {
-      skipped.push(item[nameProperty])
+      // skipped.push(item[nameProperty])
       return false
     }
 
     // check suffix - it should be a number matching user's ID
     const suffix = parts.pop()
     if (isNaN(suffix) || suffix !== String(user.id)) {
-      skipped.push(item[nameProperty])
+      // skipped.push(item[nameProperty])
       return false
     }
 
     // check prefix
     const prefix = parts.join('_')
     if (!validTypes.includes(prefix)) {
-      skipped.push(item[nameProperty])
+      // skipped.push(item[nameProperty])
       return false
     }
 
@@ -167,7 +173,7 @@ async function deleteItems ({
     return true
   })
 
-  console.log('filtered', 'to', filtered.length, typeName)
+  // console.log('filtered', 'to', filtered.length, typeName)
   for (const item of filtered) {
     // delete!
     try {
@@ -181,7 +187,7 @@ async function deleteItems ({
   }
   return {
     success,
-    skipped,
+    // skipped,
     fail
   }
 }
