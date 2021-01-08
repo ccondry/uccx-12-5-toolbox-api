@@ -430,7 +430,7 @@ function createProvision(userId, data) {
     // successful?
     if (results.ok === 1) {
       let _id
-      if (results.ok.lastErrorObject.updatedExisting) {
+      if (results.lastErrorObject.updatedExisting) {
         // updated
         _id = new db.ObjectID(results.value._id)
       } else {
