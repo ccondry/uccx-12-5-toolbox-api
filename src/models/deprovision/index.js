@@ -12,6 +12,8 @@ module.exports = async function (user) {
     // delete CUCM phones and numbers
     console.log('delete jabber phones:', await cucm.deleteJabberPhones(user))
     console.log('delete jabber lines:', await cucm.deleteJabberLines(user))
+    // sync CUCM LDAP
+    console.log('initiating CUCM LDAP sync:', cucm.doLdapSync(process.env.LDAP_DIRECTORY))
     // delete UCCX objects
     console.log('delete CSQs:', await uccx.deleteCsqs(user))
     console.log('delete chat widgets:', await uccx.deleteChatWidgets(user))
