@@ -61,6 +61,27 @@ async function copyLayoutConfig (from, to) {
   }
 }
 
+async function checkMaxProvision () {
+  // MAX_USERS
+  try {
+    const maxUsers = parseInt(process.env.MAX_USERS || 75)
+    const projection = {_id: 1, created: 1, modified: 1, userId: 1}
+    // this will sort records with [0] being oldest and [length - 1] being newest
+    const sort = {modified: 1}
+    const existingUsers = await db.find('toolbox', 'user.provision', {}, projection, sort)
+    console.log('existing users in provision db:', existingUsers)
+    if (existingUsers.length >= maxUsers) {
+      // too many users provisioned. deprovision the oldest 3 now.
+      console.log('too many users provisioned. deprovisioning the oldest 3 now...')
+      await deprovision(existingUsers.shift())
+      await deprovision(existingUsers.shift())
+      await deprovision(existingUsers.shift())
+    }
+  } catch (e) {
+    console.log('failed during deprovision:', e.message)
+  }
+}
+
 async function setIpccExtension (username, extension, routePartition) {
   try {
     let existing = await cucm.getEndUserIpccExtension(username)
@@ -474,23 +495,6 @@ function markProvision(userId, updates) {
 
 // main function
 async function provision (user, password) {
-  // check the number of current users provisioned in this demo
-  // MAX_USERS
-  try {
-    const maxUsers = parseInt(process.env.MAX_USERS || 75)
-    const projection = {_id: 1, created: 1, modified: 1, userId: 1}
-    // this will sort records with [0] being oldest and [length - 1] being newest
-    const sort = {modified: 1}
-    const existingUsers = await db.find('toolbox', 'user.provision', {}, projection, sort)
-    console.log('existing users in provision db:', existingUsers)
-    if (existingUsers.length > maxUsers) {
-      const oldestUsers = [existingUsers[0], existingUsers[1], existingUsers[2]]
-      // too many users provisioned. deprovision the oldest 3 now.
-      console.log('too many users provisioned. deprovisioning the oldest 3 now:', oldestUsers)
-    }
-  } catch (e) {
-    // 
-  }
   const userId = user.id
   // add provision info to database
   await createProvision(userId, user.username, {
@@ -1683,6 +1687,9 @@ async function provision (user, password) {
 
   markProvision(userId, {$set: {status: 'complete'}})
 
+  // check the number of current users provisioned in this demo
+  checkMaxProvision()
+  
   return {
     chatInfo,
     widgetInfo,
