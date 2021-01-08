@@ -426,6 +426,7 @@ function createProvision(userId, data) {
   const dbData = {...data, userId}
   db.upsert('toolbox', 'user.provision', {userId}, dbData)
   .then(results => {
+    console.log('createProvision results:', results)
     // successful?
     if (results.ok === 1) {
       // successful - add created in epoch seconds (mongo added _id to our data)
@@ -1253,7 +1254,7 @@ async function provision (user, password) {
   
   // wait for the team to sync to finesse
   await sleep(5000)
-  
+
   // set new team's Finesse layout
   try {
     await copyLayoutConfig(cumulusMainTeamId, team1Info.teamId)
