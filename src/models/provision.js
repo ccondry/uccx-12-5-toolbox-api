@@ -429,8 +429,15 @@ function createProvision(userId, data) {
     console.log('createProvision results:', results)
     // successful?
     if (results.ok === 1) {
+      let _id
+      if (results.ok.lastErrorObject.updatedExisting) {
+        // updated
+        _id = new db.ObjectID(results.value._id)
+      } else {
+        // created
+        _id = new db.ObjectID(results.lastErrorObject.upserted)
+      }
       // successful - add created in epoch seconds (mongo added _id to our data)
-      const _id = new db.ObjectID(dbData._id)
       const query = {
         // use newly-created object ID that mongo driver appended to our data
         _id
@@ -447,7 +454,7 @@ function createProvision(userId, data) {
         }
       }
       db.updateOne('toolbox', 'user.provision', query, changes)
-      .then(r => console.log('added created date to user provision info during createProvision:', r))
+      .then(r => console.log('added created date to user provision info during createProvision:', r.result))
       .catch(e => console.log('failed to add created date to user provision info during createProvision:', e.message))
     } else {
       // failed - do nothing, let results be returned
