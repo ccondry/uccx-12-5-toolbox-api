@@ -21,6 +21,8 @@ const db = require('./db')
 // Webex Teams logging
 const teamsLogger = require('./teams-logger')
 
+const deprovision = require('./deprovision')
+
 // validate .env vars
 validate([
   'LDAP_LAB_USERS_DN',
