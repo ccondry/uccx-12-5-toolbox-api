@@ -23,6 +23,9 @@ const teamsLogger = require('./teams-logger')
 
 const deprovision = require('./deprovision')
 
+// task runner queue
+const queue = require('./queue')
+
 // validate .env vars
 validate([
   'LDAP_LAB_USERS_DN',
@@ -1689,9 +1692,9 @@ async function provision (user, password) {
 
   markProvision(userId, {$set: {status: 'complete'}})
   console.log(`finised provisioning ${user.username} ${user.id}`)
-  // check the number of current users provisioned in this demo
-  checkMaxProvision()
-  
+  // queue task to check the number of current users provisioned in this demo
+  queue(async () => await checkMaxProvision(user, password))
+  // return provision info?
   return {
     chatInfo,
     widgetInfo,
