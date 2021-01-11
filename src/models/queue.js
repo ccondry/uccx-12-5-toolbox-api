@@ -34,7 +34,8 @@ async function run () {
 // start task runner now
 run()
 
-module.exports = function (task) {
+module.exports = function (task, info) {
+  console.log('adding task to the queue', info)
   // add to the queue
   queue.push(task)
 }

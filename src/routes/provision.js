@@ -35,7 +35,7 @@ router.post('/', async function (req, res) {
     // user's new RDP and VPN account password
     const password = req.body.password
     // add to queue
-    queue(async () => await provision(user, password))
+    queue(async () => await provision(user, password), `provision user ${user.username} ${user.id}`)
     // accepted
     return res.status(202).send()
   } catch (e) {
