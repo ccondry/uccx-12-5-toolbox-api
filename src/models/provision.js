@@ -87,7 +87,7 @@ async function checkMaxProvision () {
       user = existingUsers.shift()
       queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
     } else {
-      console.log(`checking max users provisioned is not exceeding ${maxUsers}`)
+      console.log(`max users provisioned is ${existingUsers.length}, which does not exceed the max of ${maxUsers}`)
     }
   } catch (e) {
     console.log(`there are ${existingUsers.length}. not too many.`)
