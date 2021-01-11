@@ -70,6 +70,7 @@ async function checkMaxProvision () {
   // MAX_USERS
   try {
     const maxUsers = parseInt(process.env.MAX_USERS || 75)
+    console.log(`checking max users provisioned is not exceeding ${maxUsers}`)
     const projection = {_id: 1, created: 1, modified: 1, userId: 1}
     // this will sort records with [0] being oldest and [length - 1] being newest
     const sort = {modified: 1}
@@ -77,13 +78,14 @@ async function checkMaxProvision () {
     // console.log('existing users in provision db:', existingUsers)
     if (existingUsers.length >= maxUsers) {
       // too many users provisioned. deprovision the oldest 3 now.
-      console.log('too many users provisioned. deprovisioning the oldest 3 now...')
-      await deprovision(existingUsers.shift())
-      await deprovision(existingUsers.shift())
-      await deprovision(existingUsers.shift())
+      console.log(`too many users provisioned - there are ${existingUsers.length}. queueing tasks to deprovision the oldest 3.`)
+      // queue tasks to deprovision the oldest 3 users
+      queue(async () => await deprovision(existingUsers.shift()))
+      queue(async () => await deprovision(existingUsers.shift()))
+      queue(async () => await deprovision(existingUsers.shift()))
     }
   } catch (e) {
-    console.log('failed during deprovision:', e.message)
+    console.log('failed during checkMaxProvision:', e.message)
   }
 }
 
@@ -479,7 +481,6 @@ function createProvision(userId, username, data) {
         }
       }
       db.updateOne('toolbox', 'user.provision', query, changes)
-      .then(r => console.log('added created date to user provision info during createProvision:', r.result))
       .catch(e => console.log('failed to add created date to user provision info during createProvision:', e.message))
     } else {
       // failed - do nothing, let results be returned
@@ -1692,8 +1693,10 @@ async function provision (user, password) {
 
   markProvision(userId, {$set: {status: 'complete'}})
   console.log(`finised provisioning ${user.username} ${user.id}`)
-  // queue task to check the number of current users provisioned in this demo
-  queue(async () => await checkMaxProvision(user, password))
+  
+  // check the number of current users provisioned in this demo is not exceeding the limit
+  checkMaxProvision()
+
   // return provision info?
   return {
     chatInfo,
