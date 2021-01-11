@@ -13,13 +13,16 @@ async function run () {
   // loop forever
   while (true) {
     if (queue.length) {
+      console.log(`processing queue - ${queue.length} task(s) to run`)
       // get first task and remove it from the queue
       const task = queue.shift()
       // execute task and wait for it to complete
       try {
+        console.log(`processing queue - task started`)
         await task()
+        console.log(`processing queue - task complete`)
       } catch (e) {
-        console.log('failed to run provision or deprovision task:', e.message)
+        console.log('queued task failed:', e.message)
       }
     } else {
       // wait a moment before checking queue again
