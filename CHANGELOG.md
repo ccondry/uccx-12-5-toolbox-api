@@ -3,6 +3,13 @@
 Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
+# 2021.1.11-1
+### Bug Fixes
+* **Provision:** fixed an issue where sometimes the Finesse team layout would
+not get set if Finesse did not sync fast enough
+* **Deprovision:** remove email account when deprovisioning users
+
+
 # 2021.1.11
 ### Features
 * **Release:** QA release
