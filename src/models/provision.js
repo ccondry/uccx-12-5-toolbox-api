@@ -110,10 +110,15 @@ async function checkMaxProvision () {
       console.log(`too many users provisioned - there are ${existingUsers.length}. queueing tasks to deprovision the oldest 3.`)
       // queue tasks to deprovision the oldest 3 users
       let user = existingUsers.shift()
+      console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
       queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
+      // user 2
       user = existingUsers.shift()
+      console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
       queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
+      // user 3
       user = existingUsers.shift()
+      console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
       queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
     } else {
       console.log(`max users provisioned is ${existingUsers.length}, which does not exceed the max of ${maxUsers}`)
