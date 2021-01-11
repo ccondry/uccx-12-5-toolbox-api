@@ -77,6 +77,9 @@ app.use(urlBase + '/user', require('./routes/user'))
 // provision new user, and get demo user provision info
 app.use(urlBase + '/provision', require('./routes/provision'))
 
+// get/set demo user configuration, like vertical selection
+app.use(urlBase + '/cumulus', require('./routes/cumulus'))
+
 // public REST APIs
 app.use(urlBase + '/public', require('./routes/public'))
 
