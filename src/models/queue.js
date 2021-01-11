@@ -41,17 +41,24 @@ function addTask (task, info) {
 }
 
 // fill task runner with any incomplete provision user tasks
-const unfinishedTasks = await db.find('toolbox', 'user.provision', {status: 'working'})
-for (const task of unfinishedTasks) {
-  const user = {
-    id: task.userId,
-    username: task.username
+db.find('toolbox', 'user.provision', {status: 'working'})
+.then(unfinishedTasks => {
+  for (const task of unfinishedTasks) {
+    const user = {
+      id: task.userId,
+      username: task.username
+    }
+    // add to queue - use default password since their LDAP account is likely (hopefully) already created
+    addTask(async () => await provision(user, 'C1sco12345'), `provision user ${user.username} ${user.id}`)
   }
-  // add to queue - use default password since their LDAP account is likely (hopefully) already created
-  addTask(async () => await provision(user, 'C1sco12345'), `provision user ${user.username} ${user.id}`)
-}
+})
+.catch(e => {
+  console.log('failed while finding unfinished tasks at service start:', e.message)
+})
+.finally(() => {
+  // start task runner now
+  run()
+})
 
-// start task runner now
-run()
 
 module.exports = addTask
