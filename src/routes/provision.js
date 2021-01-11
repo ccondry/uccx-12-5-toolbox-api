@@ -3,6 +3,40 @@ const router = express.Router()
 const db = require('../models/db')
 const provision = require('../models/provision')
 const queue = require('../models/queue')
+const deprovision = require('../models/deprovision')
+
+async function checkMaxProvision () {
+  // MAX_USERS
+  try {
+    const maxUsers = parseInt(process.env.MAX_USERS || 75)
+    console.log(`checking max users provisioned is not exceeding ${maxUsers}`)
+    const projection = {_id: 1, created: 1, modified: 1, userId: 1, username: 1}
+    // this will sort records with [0] being oldest and [length - 1] being newest
+    const sort = {modified: 1}
+    const existingUsers = await db.find('toolbox', 'user.provision', {}, projection, sort)
+    // console.log('existing users in provision db:', existingUsers)
+    if (existingUsers.length >= maxUsers) {
+      // too many users provisioned. deprovision the oldest 3 now.
+      console.log(`too many users provisioned - there are ${existingUsers.length}. queueing tasks to deprovision the oldest 3.`)
+      // queue tasks to deprovision the oldest 3 users
+      let user = existingUsers.shift()
+      console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
+      queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
+      // user 2
+      user = existingUsers.shift()
+      console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
+      queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
+      // user 3
+      user = existingUsers.shift()
+      console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
+      queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
+    } else {
+      console.log(`max users provisioned is ${existingUsers.length}, which does not exceed the max of ${maxUsers}`)
+    }
+  } catch (e) {
+    console.log(`there are ${existingUsers.length}. not too many.`)
+  }
+}
 
 // get provision status
 router.get('/', async function (req, res) {
@@ -36,6 +70,7 @@ router.post('/', async function (req, res) {
     const password = req.body.password
     // add to queue
     queue(async () => await provision(user, password), `provision user ${user.username} ${user.id}`)
+    checkMaxProvision()
     // accepted
     return res.status(202).send()
   } catch (e) {
