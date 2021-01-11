@@ -16,20 +16,15 @@ async function checkMaxProvision () {
     const existingUsers = await db.find('toolbox', 'user.provision', {}, projection, sort)
     // console.log('existing users in provision db:', existingUsers)
     if (existingUsers.length >= maxUsers) {
-      // too many users provisioned. deprovision the oldest 3 now.
-      console.log(`too many users provisioned - there are ${existingUsers.length}. queueing tasks to deprovision the oldest 3.`)
-      // queue tasks to deprovision the oldest 3 users
-      let user = existingUsers.shift()
-      console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
-      queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
-      // user 2
-      user = existingUsers.shift()
-      console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
-      queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
-      // user 3
-      user = existingUsers.shift()
-      console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
-      queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
+      // too many users provisioned. deprovision the oldest accounts to leave (maxUsers - 3) total users
+      const qty = existingUsers.length - maxUsers + 3
+      console.log(`too many users provisioned - there are ${existingUsers.length}. queueing tasks to deprovision the oldest ${qty} users.`)
+      // queue tasks to deprovision the oldest users
+      for (let i = 0; i < qty; i++) {
+        let user = existingUsers.shift()
+        console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
+        queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
+      }
     } else {
       console.log(`max users provisioned is ${existingUsers.length}, which does not exceed the max of ${maxUsers}`)
     }
