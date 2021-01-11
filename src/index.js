@@ -71,10 +71,10 @@ Routes
 // get this API version
 app.use(urlBase + '/version', require('./routes/version'))
 
-// ldap user accounts
+// get JWT user info
 app.use(urlBase + '/user', require('./routes/user'))
 
-// demo environment info
+// provision new user, and get demo user provision info
 app.use(urlBase + '/provision', require('./routes/provision'))
 
 // public REST APIs
