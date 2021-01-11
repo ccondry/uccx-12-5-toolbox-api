@@ -1,4 +1,5 @@
 const provision = require('./provision')
+const db = require('./db')
 
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
