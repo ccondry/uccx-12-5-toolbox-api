@@ -82,18 +82,13 @@ async function syncFinesseTeam ({userId, teamName}) {
       console.log(`finesse team ${teamName} found`)
       break
     } catch (e) {
-      // failed to get resource
-      if (e.statusCode === 404) {
-        // not found
-        console.log(`finesse team ${teamName} not found. waiting ${Math.floor(resourceRetryDelay / 1000)} seconds and then trying again.`)
-        // wait a moment and try again
-        await sleep(resourceRetryDelay)
-        // increment retry counter
-        retries++
-        continue
-      } else {
-        throw e
-      }
+      // not found
+      console.log(`finesse team ${teamName} not found. waiting ${Math.floor(resourceRetryDelay / 1000)} seconds and then trying again.`)
+      // wait a moment and try again
+      await sleep(resourceRetryDelay)
+      // increment retry counter
+      retries++
+      continue
     }
   }
 }
