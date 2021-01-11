@@ -55,6 +55,35 @@ const maxResourceRetries = 30
 // delay in ms to wait for UCCX to import new resources (agents)
 const resourceRetryDelay = 20000
 
+async function syncFinesseTeam ({userId, teamId}) {
+  let retries = 0
+  let team
+  // try getting team, trying up to "maxResourceRetries" times before throwing error
+  while (!team && retries <= maxResourceRetries) {
+    try {
+      // try to get resource
+      markProvision(userId, {$set: {finesseUserSync: `working - attempt ${retries}`}})
+      console.log(`trying to find finesse team ${teamId}...`)
+      team = await finesse.get('Team', teamId)
+      console.log(`finesse team ${teamId} found`)
+      break
+    } catch (e) {
+      // failed to get resource
+      if (e.statusCode === 404) {
+        // not found
+        console.log(`finesse team ${teamId} not found. waiting ${Math.floor(resourceRetryDelay / 1000)} seconds and then trying again.`)
+        // wait a moment and try again
+        await sleep(resourceRetryDelay)
+        // increment retry counter
+        retries++
+        continue
+      } else {
+        throw e
+      }
+    }
+  }
+}
+
 // copy Finesse layout XML config from team ID "from" to team ID "to"
 async function copyLayoutConfig (from, to) {
   try {
@@ -1350,7 +1379,14 @@ async function provision (user, password) {
   }
   
   // wait for the teams to sync to finesse
-  await sleep(15 * 1000)
+  await syncFinesseTeam({
+    userId,
+    teamId: team1Info.teamId
+  })
+  await syncFinesseTeam({
+    userId,
+    teamId: team2Info.teamId
+  })
 
   // set new team's Finesse layout
   try {
