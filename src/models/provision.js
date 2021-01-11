@@ -15,7 +15,7 @@ const triggerTemplate = require('./templates/trigger')
 
 const validate = require('./validate')
 
-const createEmail = require('./create-email')
+const email = require('./email')
 const db = require('./db')
 
 // Webex Teams logging
@@ -1374,7 +1374,7 @@ async function provision (user, password) {
 
   // create support email address
   try {
-    await createEmail('support_' + userId)
+    await email.create('support_' + userId)
     console.log('successfully created support email support_' + userId)
     markProvision(userId, {$set: {emailAddress: true}})
   } catch (e) {

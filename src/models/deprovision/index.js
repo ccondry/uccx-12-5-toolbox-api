@@ -3,6 +3,7 @@ const cucm = require('./cucm')
 const uccx = require('./uccx')
 const ldap = require('./ldap')
 const db = require('../db')
+const email = require('../email')
 
 // max number of retries to wait for UCCX to import new resources (agents)
 const maxResourceRetries = 30
@@ -49,6 +50,8 @@ module.exports = async function (user) {
     // delete LDAP accounts
     console.log('delete demo agents:', await ldap.deleteDemoUsers(user))
     console.log('delete demo users:', await ldap.deleteDemoAdmins(user))
+    // delete linux email account
+    console.log('delete linux mail account:', await email.remove('support_' + user.id))
     // delete CUCM phones and numbers
     console.log('delete jabber phones:', await cucm.deleteJabberPhones(user))
     console.log('delete jabber lines:', await cucm.deleteJabberLines(user))
