@@ -15,14 +15,14 @@ async function run () {
     if (queue.length) {
       console.log(`processing queue - ${queue.length} task(s) to run`)
       // get first task and remove it from the queue
-      const task = queue.shift()
+      const {task, info} = queue.shift()
       // execute task and wait for it to complete
       try {
-        console.log(`processing queue - task started`)
+        console.log(`processing queue - task started:`, info)
         await task()
-        console.log(`processing queue - task complete`)
+        console.log(`processing queue - task complete:`, info)
       } catch (e) {
-        console.log('queued task failed:', e.message)
+        console.log('queued task failed:', info, ':', e.message)
       }
     } else {
       // wait a moment before checking queue again
@@ -35,7 +35,7 @@ async function run () {
 run()
 
 module.exports = function (task, info) {
-  console.log('adding task to the queue', info)
+  console.log('adding task to the queue:', info)
   // add to the queue
-  queue.push(task)
+  queue.push({task, info})
 }
