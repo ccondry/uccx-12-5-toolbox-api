@@ -1283,19 +1283,6 @@ async function provision (user, password) {
     markProvision(userId, {$set: {team1: false}})
     console.error('failed to get or create Cumulus team info:', e.message)
   }
-  
-  // wait for the team to sync to finesse
-  await sleep(5000)
-
-  // set new team's Finesse layout
-  try {
-    await copyLayoutConfig(cumulusMainTeamId, team1Info.teamId)
-    console.log('successfully copied Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id)
-    markProvision(userId, {$set: {team1Layout: true}})
-  } catch (e) {
-    markProvision(userId, {$set: {team1Layout: false}})
-    console.warn('failed to copy Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id, e.message)
-  }
 
   // create 2Ring Team
   try {
@@ -1351,6 +1338,19 @@ async function provision (user, password) {
   } catch (e) {
     console.error('failed to get or create 2Ring team info:', e.message)
     markProvision(userId, {$set: {team2: false}})
+  }
+  
+  // wait for the teams to sync to finesse
+  await sleep(15 * 1000)
+
+  // set new team's Finesse layout
+  try {
+    await copyLayoutConfig(cumulusMainTeamId, team1Info.teamId)
+    console.log('successfully copied Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id)
+    markProvision(userId, {$set: {team1Layout: true}})
+  } catch (e) {
+    markProvision(userId, {$set: {team1Layout: false}})
+    console.warn('failed to copy Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id, e.message)
   }
 
   // set new team's Finesse layout
