@@ -1,3 +1,5 @@
+const provision = require('./provision')
+
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -31,11 +33,25 @@ async function run () {
   }
 }
 
-// start task runner now
-run()
-
-module.exports = function (task, info) {
+// add a task to the queue
+function addTask (task, info) {
   console.log('adding task to the queue:', info)
   // add to the queue
   queue.push({task, info})
 }
+
+// fill task runner with any incomplete provision user tasks
+const unfinishedTasks = await db.find('toolbox', 'user.provision', {status: 'working'})
+for (const task of unfinishedTasks) {
+  const user = {
+    id: task.userId,
+    username: task.username
+  }
+  // add to queue - use default password since their LDAP account is likely (hopefully) already created
+  addTask(async () => await provision(user, 'C1sco12345'), `provision user ${user.username} ${user.id}`)
+}
+
+// start task runner now
+run()
+
+module.exports = addTask
