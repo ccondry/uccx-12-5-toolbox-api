@@ -39,8 +39,8 @@ validate([
 // constants
 const VPN_USER_GROUP = process.env.VPN_USER_GROUP || 'CN=Demo Admins,CN=Users,DC=dcloud,DC=cisco,DC=com'
 const DOMAIN_ADMINS_USER_GROUP = 'CN=Domain Admins,CN=Users,DC=dcloud,DC=cisco,DC=com'
-const cumulusMainTeamId = 4
-const cumulus2RingTeamId = 16
+const cumulusMainTeamName = 4
+const cumulus2RingTeamName = 16
 // const cumulusCrmTeamId = 17
 
 function sleep (ms) {
@@ -55,7 +55,21 @@ const maxResourceRetries = 30
 // delay in ms to wait for UCCX to import new resources (agents)
 const resourceRetryDelay = 20000
 
-async function syncFinesseTeam ({userId, teamId}) {
+async function findFinesseTeam (teamName) {
+  try {
+    const teams = await finesse.list('Team')
+    const team = teams.find(t => t.name === teamName)
+    if (team) {
+      return team
+    } else {
+      throw Error(`Finesse team ${teamName} not found`)
+    }
+  } catch (e) {
+    throw e
+  }
+}
+
+async function syncFinesseTeam ({userId, teamName}) {
   let retries = 0
   let team
   // try getting team, trying up to "maxResourceRetries" times before throwing error
@@ -63,15 +77,15 @@ async function syncFinesseTeam ({userId, teamId}) {
     try {
       // try to get resource
       markProvision(userId, {$set: {finesseUserSync: `working - attempt ${retries}`}})
-      console.log(`trying to find finesse team ${teamId}...`)
-      team = await finesse.get('Team', teamId)
-      console.log(`finesse team ${teamId} found`)
+      console.log(`trying to find finesse team ${teamName}...`)
+      team = await findFinesseTeam(teamName)
+      console.log(`finesse team ${teamName} found`)
       break
     } catch (e) {
       // failed to get resource
       if (e.statusCode === 404) {
         // not found
-        console.log(`finesse team ${teamId} not found. waiting ${Math.floor(resourceRetryDelay / 1000)} seconds and then trying again.`)
+        console.log(`finesse team ${teamName} not found. waiting ${Math.floor(resourceRetryDelay / 1000)} seconds and then trying again.`)
         // wait a moment and try again
         await sleep(resourceRetryDelay)
         // increment retry counter
@@ -87,9 +101,13 @@ async function syncFinesseTeam ({userId, teamId}) {
 // copy Finesse layout XML config from team ID "from" to team ID "to"
 async function copyLayoutConfig (from, to) {
   try {
+    // find Finesse team IDs by team names
+    const fromTeam = await findFinesseTeam(from)
+    const toTeam = await findFinesseTeam(to)
+
     // console.log('copying Finesse layout config XML from', from, 'to', to)
-    const layout = await finesse.getFromTeam(from, 'LayoutConfig')
-    await finesse.saveToTeam(to, 'LayoutConfig', layout)
+    const layout = await finesse.getFromTeam(fromTeam.id, 'LayoutConfig')
+    await finesse.saveToTeam(toTeam.id, 'LayoutConfig', layout)
   } catch (e) {
     throw e
   }
@@ -459,12 +477,12 @@ async function findOrCreateTeam (teams, body) {
     if (team) {
       // found team
       refUrl = team.self
-      console.log('found existing team:', refUrl)
+      console.log('found existing UCCX team:', refUrl)
     } else {
       //  team not found - create now
-      console.log(`creating team ${body.teamname}`)
+      console.log(`creating UCCX team ${body.teamname}`)
       refUrl = await uccx.team.create(body)
-      console.log('successfully created team:', refUrl)
+      console.log('successfully created UCCX team:', refUrl)
     }
   } catch (e) {
     throw e
@@ -591,6 +609,9 @@ async function provision (user, password) {
   // trigger dialed number for IVR campaign
   // const ivrTrigger = '1' + userId
   const applicationTrigger = '2' + userId
+  const userCumulusTeamName = 'Cumulus_' + userId
+  const user2RingTeamName = '2Ring_' + userId
+
 
   // create LDAP user account for VPN
   try {
@@ -1263,7 +1284,7 @@ async function provision (user, password) {
   // create Cumulus Team
   try {
     const teamBody = {
-      teamname: 'Cumulus_' + userId,
+      teamname: userCumulusTeamName,
       primarySupervisor: {
         '@name': 'Rick Barrows',
         refURL: supervisor.self
@@ -1330,7 +1351,7 @@ async function provision (user, password) {
   // create 2Ring Team
   try {
     const teamBody = {
-      teamname: '2Ring_' + userId,
+      teamname: user2RingTeamName,
       primarySupervisor: {
         '@name': 'James Bracksted',
         refURL: supervisor2.self
@@ -1386,30 +1407,30 @@ async function provision (user, password) {
   // wait for the teams to sync to finesse
   await syncFinesseTeam({
     userId,
-    teamId: team1Info.teamId
+    teamName: userCumulusTeamName
   })
   await syncFinesseTeam({
     userId,
-    teamId: team2Info.teamId
+    teamName: user2RingTeamName
   })
 
   // set new team's Finesse layout
   try {
-    await copyLayoutConfig(cumulusMainTeamId, team1Info.teamId)
-    console.log('successfully copied Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id)
+    await copyLayoutConfig(cumulusMainTeamName, userCumulusTeamName)
+    console.log('successfully copied Finesse Team Layout XML from team', cumulusMainTeamName, 'to', userCumulusTeamName, 'for', user.username, user.id)
     markProvision(userId, {$set: {team1Layout: true}})
   } catch (e) {
     markProvision(userId, {$set: {team1Layout: false}})
-    console.warn('failed to copy Finesse Team Layout XML from team', cumulusMainTeamId, 'to', team1Info.teamId, 'for', user.username, user.id, e.message)
+    console.warn('failed to copy Finesse Team Layout XML from team', cumulusMainTeamName, 'to', userCumulusTeamName, 'for', user.username, user.id, e.message)
   }
 
   // set new team's Finesse layout
   try {
-    await copyLayoutConfig(cumulus2RingTeamId, team2Info.teamId)
-    console.log('successfully copied Finesse Team Layout XML from team', cumulus2RingTeamId, 'to', team2Info.teamId, 'for', user.username, user.id)
+    await copyLayoutConfig(cumulus2RingTeamName, user2RingTeamName)
+    console.log('successfully copied Finesse Team Layout XML from team', cumulus2RingTeamName, 'to', user2RingTeamName, 'for', user.username, user.id)
     markProvision(userId, {$set: {team2Layout: true}})
   } catch (e) {
-    console.warn('failed to copy Finesse Team Layout XML from team', cumulus2RingTeamId, 'to', team2Info.teamId, 'for', user.username, user.id, e.message)
+    console.warn('failed to copy Finesse Team Layout XML from team', cumulus2RingTeamName, 'to', user2RingTeamName, 'for', user.username, user.id, e.message)
     markProvision(userId, {$set: {team2Layout: false}})
   }
 
