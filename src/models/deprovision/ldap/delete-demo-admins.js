@@ -10,7 +10,7 @@ module.exports = async function (user) {
 
   // find the ldap account matching input user
   const users = ldapUsers.filter(u => u.sAMAccountName === user.username)
-  console.log('deleting ldap vpn users:', users)
+  // console.log('deleting ldap vpn users:', users)
   const {success, failed} = await ldap.deleteUsers(users)
   // return results
   return {
