@@ -878,7 +878,6 @@ async function provision (user, password) {
       console.log(`sjeffers${userId} found`)
       break
     } catch (e) {
-      // console.log(`failed to get UCCX resource sjeffers${userId}:`, e.message)
       // failed to get resource
       if (e.statusCode === 404) {
         // not found
