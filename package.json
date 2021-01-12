@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "NODE_EXTRA_CA_CERTS=certs/ca.pem node src/index",
+    "test:agent": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/agent",
     "test:resource": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/resource",
     "test:team": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/team",
     "test:trigger": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/trigger",
