@@ -51,7 +51,8 @@ module.exports = async function (user) {
     console.log('delete demo agents:', await ldap.deleteDemoUsers(user))
     console.log('delete demo users:', await ldap.deleteDemoAdmins(user))
     // delete linux email account
-    console.log('delete linux mail account:', await email.remove('support_' + user.id))
+    console.log('delete linux mail account:', 'support_' + user.id)
+    await email.remove('support_' + user.id)
     // delete CUCM phones and numbers
     console.log('delete jabber phones:', await cucm.deleteJabberPhones(user))
     console.log('delete jabber lines:', await cucm.deleteJabberLines(user))
