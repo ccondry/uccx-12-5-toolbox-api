@@ -9,6 +9,7 @@
     "test:team": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/team",
     "test:trigger": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/trigger",
     "test:finesse": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/finesse",
+    "test:queue": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/queue",
     "test:deprovision": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/deprovision"
   },
   "repository": "https://github.com/ccondry/uccx-12-5-toolbox-api.git",
