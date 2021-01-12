@@ -26,10 +26,10 @@ async function checkMaxProvision () {
         queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
       }
     } else {
-      console.log(`max users provisioned is ${existingUsers.length}, which does not exceed the max of ${maxUsers}`)
+      console.log(`there are ${existingUsers.length} users, which does not exceed the max of ${maxUsers}`)
     }
   } catch (e) {
-    console.log(`there are ${existingUsers.length}. not too many.`)
+    console.log(`failed to check max users provisioned:`, e.message)
   }
 }
 

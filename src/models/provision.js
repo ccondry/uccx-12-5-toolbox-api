@@ -881,7 +881,7 @@ async function provision (user, password) {
       // failed to get resource
       if (e.statusCode === 404) {
         // not found
-        console.log('sjeffers' + userId, 'not found. waiting 20 seconds and then trying again.')
+        console.log(`sjeffers${userId} not found. waiting ${Math.floor(resourceRetryDelay / 1000)} seconds and then trying again.`)
         // wait a moment and try again
         await sleep(resourceRetryDelay)
         // increment retry counter
@@ -911,7 +911,7 @@ async function provision (user, password) {
       // failed to get resource
       if (e.statusCode === 404) {
         // not found
-        console.log('jopeters' + userId, 'not found. waiting 20 seconds and then trying again.')
+        console.log(`jopeters${userId} not found. waiting ${Math.floor(resourceRetryDelay / 1000)} seconds and then trying again.`)
         // wait a moment and try again
         await sleep(resourceRetryDelay)
         // increment retry counter
@@ -940,7 +940,7 @@ async function provision (user, password) {
       // failed to get resource
       if (e.statusCode === 404) {
         // not found
-        console.log('rbarrows' + userId, 'not found. waiting 20 seconds and then trying again.')
+        console.log(`rbarrows${userId} not found. waiting ${Math.floor(resourceRetryDelay / 1000)} seconds and then trying again.`)
         // wait a moment and try again
         await sleep(resourceRetryDelay)
         // increment retry counter
@@ -969,7 +969,7 @@ async function provision (user, password) {
       // failed to get resource
       if (e.statusCode === 404) {
         // not found
-        console.log('hliang' + userId, 'not found. waiting 20 seconds and then trying again.')
+        console.log(`hliang${userId} not found. waiting ${Math.floor(resourceRetryDelay / 1000)} seconds and then trying again.`)
         // wait a moment and try again
         await sleep(resourceRetryDelay)
         // increment retry counter
@@ -999,7 +999,7 @@ async function provision (user, password) {
       // failed to get resource
       if (e.statusCode === 404) {
         // not found
-        console.log('jabracks' + userId, 'not found. waiting 20 seconds and then trying again.')
+        console.log(`jabracks${userId} not found. waiting ${Math.floor(resourceRetryDelay / 1000)} seconds and then trying again.`)
         // wait a moment and try again
         await sleep(resourceRetryDelay)
         // increment retry counter
