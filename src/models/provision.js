@@ -1298,7 +1298,7 @@ async function provision (user, password) {
     team1Info = await findOrCreateTeam(teams, teamBody)
     // append team ID
     team1Info.teamId = team1Info.refUrl.split('/').pop()
-    console.log('successfully created team', teamBody.teamname)
+    // console.log('successfully created team', teamBody.teamname)
     markProvision(userId, {$set: {team1: true}})
   } catch (e) {
     markProvision(userId, {$set: {team1: false}})
@@ -1354,7 +1354,7 @@ async function provision (user, password) {
     team2Info = await findOrCreateTeam(teams, teamBody)
     // append team ID
     team2Info.teamId = team2Info.refUrl.split('/').pop()
-    console.log('successfully created team', teamBody.teamname)
+    // console.log('successfully created team', teamBody.teamname)
     markProvision(userId, {$set: {team2: true}})
   } catch (e) {
     console.error('failed to get or create 2Ring team info:', e.message)
