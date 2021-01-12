@@ -873,11 +873,12 @@ async function provision (user, password) {
     try {
       // try to get resource
       markProvision(userId, {$set: {uccxUserSync: 'working - attempt ' + retries}})
-      console.log('trying to find', 'sjeffers' + userId)
-      agent1 = await uccx.resource.get('sjeffers' + userId)
-      console.log('sjeffers' + userId, 'found')
+      console.log(`trying to find sjeffers${userId}`)
+      agent1 = await uccx.resource.get()
+      console.log(` found`)
       break
     } catch (e) {
+      console.log(`failed to get UCCX resource sjeffers${userId}:`, e.message)
       // failed to get resource
       if (e.statusCode === 404) {
         // not found
