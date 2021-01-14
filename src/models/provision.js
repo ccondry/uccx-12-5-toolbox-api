@@ -32,11 +32,10 @@ validate([
   'VPN_USER_GROUP'
 ])
 // constants
-const VPN_USER_GROUP = process.env.VPN_USER_GROUP || 'CN=Demo Admins,CN=Users,DC=dcloud,DC=cisco,DC=com'
-const DOMAIN_ADMINS_USER_GROUP = 'CN=Domain Admins,CN=Users,DC=dcloud,DC=cisco,DC=com'
-const cumulusMainTeamName = 4
-const cumulus2RingTeamName = 16
-// const cumulusCrmTeamId = 17
+const VPN_USER_GROUP = process.env.VPN_USER_GROUP || 'CN=Demo Admins,CN=Users,' + process.env.LDAP_BASE_DN
+const DOMAIN_ADMINS_USER_GROUP = 'CN=Domain Admins,' + process.env.LDAP_BASE_DN
+const cumulusMainTeamName = process.env.MAIN_TEAM_NAME || 'CumulusMain'
+const cumulus2RingTeamName = process.env.TWORING_TEAM_NAME || '2Ring'
 
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
