@@ -70,7 +70,6 @@ async function syncFinesseTeam ({userId, teamName}) {
   while (!team && retries <= maxResourceRetries) {
     try {
       // try to get resource
-      markProvision(userId, {$set: {finesseUserSync: `working - attempt ${retries}`}})
       console.log(`trying to find finesse team ${teamName}...`)
       team = await findFinesseTeam(teamName)
       console.log(`finesse team ${teamName} found`)
@@ -1361,6 +1360,7 @@ async function provision (user, password) {
   }
   
   // wait for the teams to sync to finesse
+  markProvision(userId, {$set: {finesseTeamSync: `working - attempt ${retries}`}})
   await syncFinesseTeam({
     userId,
     teamName: userCumulusTeamName
@@ -1369,7 +1369,8 @@ async function provision (user, password) {
     userId,
     teamName: user2RingTeamName
   })
-
+  markProvision(userId, {$set: {finesseTeamSync: true}})
+  
   // set new team's Finesse layout
   try {
     await copyLayoutConfig(cumulusMainTeamName, userCumulusTeamName)
