@@ -33,7 +33,7 @@ validate([
 ])
 // constants
 const VPN_USER_GROUP = process.env.VPN_USER_GROUP || 'CN=Demo Admins,CN=Users,' + process.env.LDAP_BASE_DN
-const DOMAIN_ADMINS_USER_GROUP = 'CN=Domain Admins,' + process.env.LDAP_BASE_DN
+const DOMAIN_ADMINS_USER_GROUP = 'CN=Domain Admins,CN=Users,' + process.env.LDAP_BASE_DN
 const cumulusMainTeamName = process.env.MAIN_TEAM_NAME || 'CumulusMain'
 const cumulus2RingTeamName = process.env.TWORING_TEAM_NAME || '2Ring'
 
