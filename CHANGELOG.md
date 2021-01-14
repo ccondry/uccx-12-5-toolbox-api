@@ -3,6 +3,12 @@
 Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
+
+# 2021.1.13
+### Bug Fixes
+* **Provision:** remove extra check for max users during provision
+
+
 # 2021.1.11-1
 ### Bug Fixes
 * **Provision:** fixed an issue where sometimes the Finesse team layout would
