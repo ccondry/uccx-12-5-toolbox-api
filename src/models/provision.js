@@ -1718,9 +1718,6 @@ async function provision (user, password) {
   markProvision(userId, {$set: {status: 'complete'}})
   console.log(`finised provisioning ${user.username} ${user.id}`)
   
-  // check the number of current users provisioned in this demo is not exceeding the limit
-  checkMaxProvision()
-
   // return provision info?
   return {
     chatInfo,
