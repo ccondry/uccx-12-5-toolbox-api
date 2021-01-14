@@ -1730,4 +1730,7 @@ async function provision (user, password) {
   }
 }
 
-module.exports = provision
+module.exports = {
+  provision,
+  copyLayoutConfig
+}
