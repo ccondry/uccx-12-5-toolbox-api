@@ -5,6 +5,7 @@ const provision = require('../models/provision')
 const queue = require('../models/queue')
 const deprovision = require('../models/deprovision')
 
+// check if we have reached the max number of users, and queue deprovision tasks
 async function checkMaxProvision () {
   // MAX_USERS
   try {
@@ -65,6 +66,7 @@ router.post('/', async function (req, res) {
     const password = req.body.password
     // add to queue
     queue(async () => await provision(user, password), `provision user ${user.username} ${user.id}`)
+    // check if we have reached the max number of users provisioned
     checkMaxProvision()
     // accepted
     return res.status(202).send()
