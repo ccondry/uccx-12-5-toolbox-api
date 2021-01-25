@@ -39,7 +39,7 @@ module.exports = function ({
       '@name': channelProviderId,
       refURL: channelProviderRefUrl
     },
-    pollingInterval: 180,
+    pollingInterval: 60,
     folderName: 'Inbox',
     snapshotAge: 120
   }
