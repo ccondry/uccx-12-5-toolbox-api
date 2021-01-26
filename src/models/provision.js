@@ -511,6 +511,30 @@ function markProvision(userId, updates) {
   .catch(e => console.log('failed to update provision info in database', e.message))
 }
 
+// create user config info in database
+async function createConfig (user) {
+  try {
+    const userId = user.id
+    const existingCumulusConfig = await db.findOne('toolbox', 'cumulus.config', {userId})
+    if (!existingCumulusConfig) {
+      // it didn't exist - create it
+      await db.insertOne('toolbox', 'cumulus.config', {
+        userId,
+        vertical: user.vertical || 'travel'
+      })
+    }
+  } catch (e) {
+    throw e
+  }
+}
+
+// set user config info in database
+async function setConfig (userId, changes) {
+  return db.updateOne('toolbox', 'cumulus.config', {userId}, {
+    $set: changes
+  })
+}
+
 // main function
 async function provision (user, password) {
   const userId = user.id
@@ -521,14 +545,7 @@ async function provision (user, password) {
     uccxUserSync: 'not started'
   })
   // make sure cumulus.config object exists for this user
-  const existingCumulusConfig = await db.findOne('toolbox', 'cumulus.config', {userId})
-  if (!existingCumulusConfig) {
-    // it didn't exist - create it
-    await db.insertOne('toolbox', 'cumulus.config', {
-      userId,
-      vertical: user.vertical || 'travel'
-    })
-  }
+  createConfig(user)
   let ldapUsers
   let skills = []
   let csqs = []
@@ -662,11 +679,7 @@ async function provision (user, password) {
     // console.log('voice info:', voiceInfo)
     markProvision(userId, {$set: {voiceCsq: true}})
     // copy voice CSQ name to user's cumulus.config
-    await db.updateOne('toolbox', 'cumulus.config', {userId}, {
-      $set: {
-        voiceCsqName
-      }
-    })
+    setConfig(userId, {voiceCsqName})
   } catch (e) {
     console.error('failed to get voice info:', e.message)
     markProvision(userId, {$set: {voiceCsq: false}})
@@ -740,11 +753,7 @@ async function provision (user, password) {
     })
     markProvision(userId, {$set: {chatCsq: true}})
     // copy chat CSQ ID to user's cumulus.config
-    await db.updateOne('toolbox', 'cumulus.config', {userId}, {
-      $set: {
-        chatCsqId: chatInfo.csqRefUrl.split('/').pop()
-      }
-    })
+    setConfig(userId, {chatCsqId: chatInfo.csqRefUrl.split('/').pop()})
   } catch (e) {
     console.error('failed to get chat info:', e.message)
     markProvision(userId, {$set: {chatCsq: false}})
@@ -1435,11 +1444,7 @@ async function provision (user, password) {
     }
     markProvision(userId, {$set: {calendar: true}})
     // copy calendar name to user's cumulus.config
-    await db.updateOne('toolbox', 'cumulus.config', {userId}, {
-      $set: {
-        calendarName
-      }
-    })
+    setConfig(userId, {calendarName})
   } catch (e) {
     console.log('failed to create calendar', calendarName, e.message)
     markProvision(userId, {$set: {calendar: false}})
