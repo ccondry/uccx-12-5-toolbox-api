@@ -772,6 +772,8 @@ async function provision (user, password) {
       })
       console.log('created chat widget')
       markProvision(userId, {$set: {chatWidget: true}})
+      // add widgetId to user config info
+      setConfig(userId, {widgetId: widgetInfo.refUrl.split('/').pop()})
     } else {
       console.log('bubble chat widget not created - chatInfo.csqRefUrl did not exist. chatInfo was', chatInfo)
       markProvision(userId, {$set: {chatWidget: false}})
