@@ -489,7 +489,8 @@ function createProvision(userId, username, data) {
           created: new Date(_id.getTimestamp().getTime())
         },
         $currentDate: {
-          modified: { $type: 'date' }
+          modified: { $type: 'date' },
+          lastAccess: { $type: 'date' }
         }
       }
       db.updateOne('toolbox', 'user.provision', query, changes)
@@ -505,10 +506,22 @@ function createProvision(userId, username, data) {
 function markProvision(userId, updates) {
   // add modified timestamp
   updates['$currentDate'] = {
-    modified: { $type: 'date' }
+    modified: { $type: 'date' },
+    lastAccess: { $type: 'date' }
   }
   db.updateOne('toolbox', 'user.provision', {userId}, updates)
   .catch(e => console.log('failed to update provision info in database', e.message))
+}
+
+// update provision lastAccess time in database
+function markLastAccess(userId) {
+  const updates = {
+    $currentDate: {
+      lastAccess: { $type: 'date' }
+    }
+  }
+  db.updateOne('toolbox', 'user.provision', {userId}, updates)
+  .catch(e => console.log('failed to update provision lastAccess info in database', e.message))
 }
 
 // create user config info in database
@@ -1739,5 +1752,6 @@ async function provision (user, password) {
 
 module.exports = {
   provision,
-  copyLayoutConfig
+  copyLayoutConfig,
+  markLastAccess
 }
