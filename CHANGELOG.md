@@ -4,6 +4,15 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.2.3
+### Features
+* **Provision:** reduce email CSQ template polling duration to 60 seconds. Track
+user last access time.
+
+### Bug Fixes
+* **Provision:** add bubble chat widget ID during provisioning
+
+
 # 2021.1.14-2
 ### Bug Fixes
 * **Provision:** fix Finesse team sync provision status variable
