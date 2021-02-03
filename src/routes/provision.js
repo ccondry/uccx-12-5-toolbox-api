@@ -46,7 +46,6 @@ router.get('/', async function (req, res) {
     const body = existing || {}
     if (existing) {
       provision.markLastAccess(userId)
-      .catch(e => console.log('failed to mark last access time for user', username, userId, ':', e.message))
     }
     // return OK with body
     return res.status(200).send(body)
