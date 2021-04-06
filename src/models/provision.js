@@ -45,7 +45,7 @@ function sleep (ms) {
 // const userId = '0021'
 const agentPassword = 'C1sco12345'
 // max number of retries to wait for UCCX to import new resources (agents)
-const maxResourceRetries = 30
+const maxResourceRetries = 60
 // delay in ms to wait for UCCX to import new resources (agents)
 const resourceRetryDelay = 20000
 
