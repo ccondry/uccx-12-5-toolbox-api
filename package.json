@@ -8,6 +8,7 @@
     "test:agent": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/agent",
     "test:resource": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/resource",
     "test:team": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/team",
+    "test:users": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/users",
     "test:trigger": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/trigger",
     "test:finesse": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/finesse",
     "test:queue": "NODE_EXTRA_CA_CERTS=certs/ca.pem node test/queue",
