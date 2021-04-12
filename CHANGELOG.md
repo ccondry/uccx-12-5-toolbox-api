@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.4.12
+### Features
+* **Provision:** Reset user VPN password during reprovision.
+* **Reset Password:** Implement the password reset route.
+
+
 # 2021.2.3
 ### Features
 * **Provision:** reduce email CSQ template polling duration to 60 seconds. Track
