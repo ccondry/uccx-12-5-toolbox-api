@@ -147,39 +147,33 @@ function addToGroup ({groupDn, userDn}) {
 //   }
 // }
 
-async function resetPassword (req, res) {
+async function resetPassword (body) {
   try {
-    if (!req.body.newPassword) {
+    if (!body.newPassword) {
       const error = 'newPassword is required to reset a password'
-      console.log(error)
-      return res.status(500).send({error})
+      throw Error(error)
     }
     if (
-      (!req.body.userDn || req.body.userDn === '') &&
-      (!req.body.upn || req.body.upn === '') &&
-      (!req.body.username || req.body.username === '') &&
-      (!req.body.email || req.body.email === '')
+      (!body.userDn || body.userDn === '') &&
+      (!body.upn || body.upn === '') &&
+      (!body.username || body.username === '') &&
+      (!body.email || body.email === '')
     ) {
       const error = 'userDn, upn, username, or email is required to reset a password'
-      console.log(error)
-      return res.status(500).send({error})
+      throw Error(error)
     }
-    const user = req.body.userDn || req.body.email || req.body.username || req.body.email
-    console.log('password reset request received for ' + user)
+    const user = body.userDn || body.email || body.username || body.email
 
     const adminCreds = {
       adminDn: process.env.LDAP_ADMIN_DN,
       adminPassword: process.env.LDAP_ADMIN_PASSWORD,
     }
     // mix in credentials with user request data, and send request
-    let params = Object.assign({}, adminCreds, req.body)
+    let params = Object.assign({}, adminCreds, body)
     await ldap.resetPassword(params)
-    console.log('password reset successfully for ' + user)
-    return res.status(200).send()
-  } catch (error) {
-    // ... erroror checks
-    console.log(error)
-    return res.status(500).send({error})
+    return
+  } catch (e) {
+    throw e
   }
 }
 
