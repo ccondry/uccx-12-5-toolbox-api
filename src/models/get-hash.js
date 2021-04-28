@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 
 // create hash of user sub, and append it to the first 8 characters of the user sub
-function getHash (sub) {
+function getHash (email) {
   // create hash of user sub, and append it to the first 8 characters of the user sub
   // for cisco.com email addresses, just use the part before the @
   const parts = email.split('@')
@@ -12,11 +12,11 @@ function getHash (sub) {
   // with a max length of 14 characters
   const hash = crypto
   .createHash('shake128', {outputLength: 6})
-  .update(sub, 'utf-8')
+  .update(email, 'utf-8')
   .digest('base64')
   // remove any characters that are not letters, numbers, or underscores
   .replace(/\W/g, '')
-  return sub.split('@').shift().slice(0, 8) + hash
+  return email.split('@').shift().slice(0, 8) + hash
 }
 
 module.exports = getHash
