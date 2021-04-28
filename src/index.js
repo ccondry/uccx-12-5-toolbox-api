@@ -80,6 +80,9 @@ app.use(urlBase + '/provision', require('./routes/provision'))
 // get/set demo user configuration, like vertical selection
 app.use(urlBase + '/cumulus', require('./routes/cumulus'))
 
+// reset user VPN password
+app.use(urlBase + '/password', require('./routes/password'))
+
 // public REST APIs
 app.use(urlBase + '/public', require('./routes/public'))
 
