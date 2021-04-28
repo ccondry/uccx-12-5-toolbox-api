@@ -4,6 +4,7 @@ const db = require('../models/db')
 const provision = require('../models/provision')
 const queue = require('../models/queue')
 const deprovision = require('../models/deprovision')
+const getHash = require('../models/get-hash')
 
 // check if we have reached the max number of users, and queue deprovision tasks
 async function checkMaxProvision () {
@@ -23,8 +24,8 @@ async function checkMaxProvision () {
       // queue tasks to deprovision the oldest users
       for (let i = 0; i < qty; i++) {
         let user = existingUsers.shift()
-        console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
-        queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
+        console.log(`queueing user ${user.email} ${user.userId} to be deleted`)
+        queue(async () => await deprovision(user), `deprovision user ${user.email} ${user.userId}`)
       }
     } else {
       console.log(`there are ${existingUsers.length} users, which does not exceed the max of ${maxUsers}`)
@@ -37,7 +38,7 @@ async function checkMaxProvision () {
 // get provision status
 router.get('/', async function (req, res) {
   try {
-    const username = req.user.username
+    const username = getHash(req.user.email)
     const userId = req.user.id
     // get provision info from local db, matching either username or userId
     const query = { $or: [ {username}, {userId} ] }
@@ -51,7 +52,7 @@ router.get('/', async function (req, res) {
     return res.status(200).send(body)
   } catch (e) {
     // error during processing
-    console.log('failed to get provision status for', req.user.username, `(${req.user.id}):`, e.message)
+    console.log('failed to get provision status for', req.user.email, `(${req.user.id}):`, e.message)
     return res.status(500).send({message: e.message})
   }
 })
@@ -68,14 +69,14 @@ router.post('/', async function (req, res) {
     // user's new RDP and VPN account password
     const password = req.body.password
     // add to queue
-    queue(async () => await provision.provision(user, password), `provision user ${user.username} ${user.id}`)
+    queue(async () => await provision.provision(user, password), `provision user ${user.email} ${user.id}`)
     // check if we have reached the max number of users provisioned
     checkMaxProvision()
     // accepted
     return res.status(202).send()
   } catch (e) {
     // error during processing
-    console.log('failed to get provision status for', req.user.username, `(${req.user.id}):`, e.message)
+    console.log('failed to get provision status for', req.user.email, `(${req.user.id}):`, e.message)
     return res.status(500).send({message: e.message})
   }
 })
@@ -83,7 +84,7 @@ router.post('/', async function (req, res) {
 // deprovision user
 // router.delete('/', async function (req, res) {
 //   try {
-//     const username = req.user.username
+//     const username = req.user.email
 //     const userId = req.user.id
 //     const filter = { $or: [ {username}, {userId} ] }
 //     const results = await db.deleteOne('toolbox', 'user.provision', filter)
@@ -96,7 +97,7 @@ router.post('/', async function (req, res) {
 //     }
 //   } catch (e) {
 //     // error during processing
-//     console.log('failed to deprovision user', req.user.username, `(${req.user.id}):`, e.message)
+//     console.log('failed to deprovision user', req.user.email, `(${req.user.id}):`, e.message)
 //     return res.status(500).send({message: e.message})
 //   }
 // })

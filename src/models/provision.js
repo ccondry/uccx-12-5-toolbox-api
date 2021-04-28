@@ -20,6 +20,8 @@ const db = require('./db')
 
 // Webex Teams logging
 const teamsLogger = require('./teams-logger')
+// create username value from email address hash
+const getHash = require('./get-hash')
 
 // validate .env vars
 validate([
@@ -167,8 +169,8 @@ function findOrCreateLdapVpnUser (user, password) {
   return findOrCreateAgentLdapUser({
     firstName: user.firstName,
     lastName: user.lastName,
-    username: user.username,
-    commonName: user.username,
+    username: getHash(user.email),
+    commonName: getHash(user.email),
     // domain: process.env.LDAP_DOMAIN,
     // physicalDeliveryOfficeName: user.id,
     telephoneNumber: '1085' + user.id,
@@ -559,7 +561,7 @@ async function setConfig (userId, changes) {
 async function provision (user, password) {
   const userId = user.id
   // add provision info to database
-  await createProvision(userId, user.username, {
+  await createProvision(userId, getHash(user.email), {
     status: 'working',
     cucmLdapSync: 'not started',
     uccxUserSync: 'not started'
@@ -629,7 +631,7 @@ async function provision (user, password) {
       console.log('added', vpnUser.distinguishedName, 'to LDAP group', VPN_USER_GROUP)
     } catch (e) {
       if (!e.message.includes('ENTRY_EXISTS')) {
-        console.log('failed to add VPN LDAP user', user.username, 'to LDAP group', VPN_USER_GROUP, '. Continuing with provision. Error message was', e)
+        console.log('failed to add VPN LDAP user', user.email, 'to LDAP group', VPN_USER_GROUP, '. Continuing with provision. Error message was', e)
         markProvision(userId, {$set: {vpnUserGroup: false}})
       }
       // continue
@@ -646,7 +648,7 @@ async function provision (user, password) {
         markProvision(userId, {$set: {adminGroup: true}})
       } catch (e) {
         if (!e.message.includes('ENTRY_EXISTS')) {
-          console.log('failed to add VPN LDAP user', user.username, 'to LDAP group', DOMAIN_ADMINS_USER_GROUP, '. Continuing with provision. Error message was', e)
+          console.log('failed to add VPN LDAP user', user.email, 'to LDAP group', DOMAIN_ADMINS_USER_GROUP, '. Continuing with provision. Error message was', e)
           markProvision(userId, {$set: {adminGroup: false}})
         }
         // continue
@@ -1405,20 +1407,20 @@ async function provision (user, password) {
   // set new team's Finesse layout
   try {
     await copyLayoutConfig(cumulusMainTeamName, userCumulusTeamName)
-    console.log('successfully copied Finesse Team Layout XML from team', cumulusMainTeamName, 'to', userCumulusTeamName, 'for', user.username, user.id)
+    console.log('successfully copied Finesse Team Layout XML from team', cumulusMainTeamName, 'to', userCumulusTeamName, 'for', user.email, user.id)
     markProvision(userId, {$set: {team1Layout: true}})
   } catch (e) {
     markProvision(userId, {$set: {team1Layout: false}})
-    console.warn('failed to copy Finesse Team Layout XML from team', cumulusMainTeamName, 'to', userCumulusTeamName, 'for', user.username, user.id, e.message)
+    console.warn('failed to copy Finesse Team Layout XML from team', cumulusMainTeamName, 'to', userCumulusTeamName, 'for', user.email, user.id, e.message)
   }
 
   // set new team's Finesse layout
   try {
     await copyLayoutConfig(cumulus2RingTeamName, user2RingTeamName)
-    console.log('successfully copied Finesse Team Layout XML from team', cumulus2RingTeamName, 'to', user2RingTeamName, 'for', user.username, user.id)
+    console.log('successfully copied Finesse Team Layout XML from team', cumulus2RingTeamName, 'to', user2RingTeamName, 'for', user.email, user.id)
     markProvision(userId, {$set: {team2Layout: true}})
   } catch (e) {
-    console.warn('failed to copy Finesse Team Layout XML from team', cumulus2RingTeamName, 'to', user2RingTeamName, 'for', user.username, user.id, e.message)
+    console.warn('failed to copy Finesse Team Layout XML from team', cumulus2RingTeamName, 'to', user2RingTeamName, 'for', user.email, user.id, e.message)
     markProvision(userId, {$set: {team2Layout: false}})
   }
 
@@ -1743,7 +1745,7 @@ async function provision (user, password) {
   }
 
   markProvision(userId, {$set: {status: 'complete'}})
-  console.log(`finised provisioning ${user.username} ${user.id}`)
+  console.log(`finised provisioning ${user.email} ${user.id}`)
   
   // return provision info?
   return {

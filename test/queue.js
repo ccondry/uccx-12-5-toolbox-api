@@ -15,8 +15,8 @@ async function test () {
     // queue tasks to deprovision all users
     for (let i = 0; i < length; i++) {
       let user = existingUsers.shift()
-      // console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
-      queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
+      // console.log(`queueing user ${user.email} ${user.userId} to be deleted`)
+      queue(async () => await deprovision(user), `deprovision user ${user.email} ${user.userId}`)
     }
   } catch (e) {
     console.log(e)

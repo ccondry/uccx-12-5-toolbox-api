@@ -9,7 +9,6 @@ async function deleteTriggers (user) {
   const success = []
   const fail = []
 
-  // console.log(`listing ${typeName} for ${user.username} ${user.id}...`)
   const items = await uccx[type].list()
   // console.log('found', items.length, typeName, items[0])
 
@@ -142,7 +141,6 @@ async function deleteItems ({
   const success = []
   const fail = []
 
-  // console.log(`listing ${typeName} for ${user.username} ${user.id}...`)
   const items = await uccx[type].list()
   // console.log('found', items.length, typeName, items[0])
   // console.log('found', items.length, typeName, items)

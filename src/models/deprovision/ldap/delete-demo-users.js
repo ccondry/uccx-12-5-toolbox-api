@@ -2,7 +2,6 @@ const ldap = require('../../ldap')
 
 module.exports = async function (user) {
   // const skipped = []
-  // console.log(`getting ldap demo users for ${user.username} ${user.id}...`)
   const ldapUsers = await ldap.listUsers({
     searchDn: process.env.LDAP_USER_AGENTS_DN
   })

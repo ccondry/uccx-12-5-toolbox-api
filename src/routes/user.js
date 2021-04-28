@@ -8,7 +8,7 @@ router.get('/', async (req, res, next) => {
     // return to client
     return res.status(200).send(req.user)
   } catch (e) {
-    teamsLogger.log(`Failed to get user info for ${req.user.username}: ${e.message}`)
+    teamsLogger.log(`Failed to get user info for ${req.user.email}: ${e.message}`)
     return res.status(500).send({message: e.message})
   }
 })
