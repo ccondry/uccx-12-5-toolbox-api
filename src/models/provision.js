@@ -473,7 +473,7 @@ function getCucmLdapSyncStatus (directory = process.env.LDAP_DIRECTORY) {
 // add provision info to database
 function createProvision(userId, username, data) {
   const dbData = {...data, userId, username}
-  db.upsert('toolbox', 'user.provision', {userId}, dbData)
+  db.upsert('toolbox', 'user.provision', {userId, username}, dbData)
   .then(results => {
     // successful?
     if (results.ok === 1) {
