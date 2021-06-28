@@ -68,10 +68,10 @@ router.post('/', async function (req, res) {
     }
     // user's new RDP and VPN account password
     const password = req.body.password
-    // add to queue
-    queue(async () => await provision.provision(user, password), `provision user ${user.email} ${user.id}`)
     // check if we have reached the max number of users provisioned
     checkMaxProvision()
+    // add to queue
+    queue(async () => await provision.provision(user, password), `provision user ${user.email} ${user.id}`)
     // accepted
     return res.status(202).send()
   } catch (e) {
