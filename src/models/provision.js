@@ -21,7 +21,7 @@ const db = require('./db')
 // Webex Teams logging
 const teamsLogger = require('./teams-logger')
 // create username value from email address hash
-const getHash = require('./get-hash')
+// const getHash = require('./get-hash')
 
 // validate .env vars
 validate([
@@ -169,8 +169,8 @@ function findOrCreateLdapVpnUser (user, password) {
   return findOrCreateAgentLdapUser({
     firstName: user.firstName,
     lastName: user.lastName,
-    username: getHash(user.email),
-    commonName: getHash(user.email),
+    username: user.username,
+    commonName: user.username,
     // domain: process.env.LDAP_DOMAIN,
     // physicalDeliveryOfficeName: user.id,
     telephoneNumber: '1085' + user.id,
