@@ -47,7 +47,8 @@ db.find('toolbox', 'user.provision', {status: 'working'})
   for (const task of unfinishedTasks) {
     const user = {
       id: task.userId,
-      username: task.username
+      username: task.username,
+      email: task.email
     }
     // add to queue - use default password since their LDAP account is likely (hopefully) already created
     addTask(async () => await provision.provision(user, 'C1sco12345'), `provision user ${user.username} ${user.id}`)
