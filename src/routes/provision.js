@@ -12,7 +12,7 @@ async function checkMaxProvision () {
   try {
     const maxUsers = parseInt(process.env.MAX_USERS || 50)
     console.log(`checking max users provisioned is not exceeding ${maxUsers}`)
-    const projection = {_id: 1, created: 1, modified: 1, userId: 1, username: 1, lastAccess: 1}
+    const projection = {_id: 1, created: 1, modified: 1, userId: 1, username: 1, lastAccess: 1, email: 1}
     // this will sort records with [0] being oldest and [length - 1] being newest
     const sort = {lastAccess: 1}
     const existingUsers = await db.find('toolbox', 'user.provision', {}, projection, sort)
