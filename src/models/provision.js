@@ -561,7 +561,7 @@ async function setConfig (userId, changes) {
 async function provision (user, password) {
   const userId = user.id
   // add provision info to database
-  await createProvision(userId, getHash(user.email), {
+  await createProvision(userId, user.username, {
     status: 'working',
     cucmLdapSync: 'not started',
     uccxUserSync: 'not started'
