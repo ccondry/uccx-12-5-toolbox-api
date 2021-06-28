@@ -25,7 +25,7 @@ async function run () {
         await task()
         console.log(`processing queue - task complete:`, info)
       } catch (e) {
-        console.log('queued task failed:', info, ':', e.message)
+        console.log('queued task failed:', info, ':', e)
       }
     } else {
       // wait a moment before checking queue again

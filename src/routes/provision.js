@@ -12,7 +12,7 @@ async function checkMaxProvision () {
   try {
     const maxUsers = parseInt(process.env.MAX_USERS || 50)
     console.log(`checking max users provisioned is not exceeding ${maxUsers}`)
-    const projection = {_id: 1, created: 1, modified: 1, userId: 1, username: 1, lastAccess: 1, email: 1}
+    const projection = {_id: 1, created: 1, modified: 1, userId: 1, username: 1, lastAccess: 1}
     // this will sort records with [0] being oldest and [length - 1] being newest
     const sort = {lastAccess: 1}
     const existingUsers = await db.find('toolbox', 'user.provision', {}, projection, sort)
@@ -24,8 +24,8 @@ async function checkMaxProvision () {
       // queue tasks to deprovision the oldest users
       for (let i = 0; i < qty; i++) {
         let user = existingUsers.shift()
-        console.log(`queueing user ${user.email} ${user.userId} to be deleted`)
-        queue(async () => await deprovision(user), `deprovision user ${user.email} ${user.userId}`)
+        console.log(`queueing user ${user.username} ${user.userId} to be deleted`)
+        queue(async () => await deprovision(user), `deprovision user ${user.username} ${user.userId}`)
       }
     } else {
       console.log(`there are ${existingUsers.length} users, which does not exceed the max of ${maxUsers}`)
