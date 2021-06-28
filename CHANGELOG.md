@@ -4,6 +4,12 @@ Version numbers are semver-compatible dates in YYYY.MM.DD-X format,
 where X is the revision number
 
 
+# 2021.6.28
+
+### Fixes
+* **Provision:** Fix deprovision when system is at max users.
+
+
 # 2021.4.28
 ### Fixes
 * **Provision:** Generate username from hash of user email address, to fix
