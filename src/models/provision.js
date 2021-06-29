@@ -483,7 +483,9 @@ function createProvision(user, data) {
     userId: user.id,
     username: user.username,
     vpnUsername: user.vpnUsername,
-    email: user.email
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName
   }
   db.upsert('toolbox', 'user.provision', upsertFilter, dbData)
   .then(results => {

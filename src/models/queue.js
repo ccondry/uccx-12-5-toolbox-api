@@ -49,7 +49,9 @@ db.find('toolbox', 'user.provision', {status: 'working'})
       id: task.userId,
       username: task.username,
       email: task.email,
-      vpnUsername: task.vpnUsername
+      vpnUsername: task.vpnUsername,
+      firstName: task.firstName,
+      lastName: task.lastName
     }
     // add to queue - use default password since their LDAP account is likely (hopefully) already created
     addTask(async () => await provision.provision(user, 'C1sco12345'), `provision user ${user.username} ${user.id}`)
