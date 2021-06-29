@@ -166,6 +166,7 @@ async function findOrCreatePhones (userId) {
 
 // create LDAP user for VPN account
 function findOrCreateLdapVpnUser (user, password) {
+  console.log('findOrCreateLdapVpnUser', user)
   return findOrCreateAgentLdapUser({
     firstName: user.firstName,
     lastName: user.lastName,
@@ -613,7 +614,7 @@ async function provision (user, password) {
   try {
     // create VPN user in Demo Admins OU
     vpnUser = await findOrCreateLdapVpnUser(user, password)
-    // console.log('found or created VPN LDAP user:', vpnUser)
+    console.log('found or created VPN LDAP user:', vpnUser)
     // add provision info to database
     markProvision(userId, {$set: {vpnUser: true}})
   } catch (e) {
