@@ -630,7 +630,7 @@ async function provision (user, password) {
     markProvision(userId, {$set: {vpnUser: true}})
   } catch (e) {
     console.error('failed to find or create LDAP users', e.message)
-    markProvision(userId, {$set: {vpnUser: false}})
+    markProvision(userId, {$set: {vpnUser: false, status: 'error'}})
     // fail out
     throw e
   }
