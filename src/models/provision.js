@@ -573,16 +573,10 @@ async function setConfig (userId, changes) {
 async function provision (user, password) {
   const userId = user.id
   // add provision info to database
-  await createProvision({
-    userId,
-    username: user.username, 
-    vpnUsername: user.vpnUsername,
-    email: user.email,
-    data: {
-      status: 'working',
-      cucmLdapSync: 'not started',
-      uccxUserSync: 'not started'
-    }
+  await createProvision(user, {
+    status: 'working',
+    cucmLdapSync: 'not started',
+    uccxUserSync: 'not started'
   })
   // make sure cumulus.config object exists for this user
   createConfig(user)
