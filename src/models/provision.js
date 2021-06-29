@@ -278,6 +278,7 @@ async function findOrCreateAgentLdapUser ({
   usersDn = process.env.LDAP_USER_AGENTS_DN
 }) {
   try {
+    console.log('looking for ldap user', username)
     const user = await ldap.getUser(username)
     if (user) {
       // set user VPN password in LDAP
@@ -310,6 +311,7 @@ async function findOrCreateAgentLdapUser ({
       // add password to body
       body.password = password
       // create user
+      console.log('creating ldap user', username)
       await ldap.createUser(body)
       // retrieve new user
       return ldap.getUser(username)
