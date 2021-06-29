@@ -171,7 +171,7 @@ function findOrCreateLdapVpnUser (user, password) {
     firstName: user.firstName,
     lastName: user.lastName,
     username: user.vpnUsername,
-    commonName: user.username,
+    commonName: user.vpnUsername,
     // domain: process.env.LDAP_DOMAIN,
     // physicalDeliveryOfficeName: user.id,
     telephoneNumber: '1085' + user.id,
