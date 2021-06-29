@@ -170,7 +170,7 @@ function findOrCreateLdapVpnUser (user, password) {
   return findOrCreateAgentLdapUser({
     firstName: user.firstName,
     lastName: user.lastName,
-    username: user.username,
+    username: user.vpnUsername,
     commonName: user.username,
     // domain: process.env.LDAP_DOMAIN,
     // physicalDeliveryOfficeName: user.id,
@@ -474,9 +474,18 @@ function getCucmLdapSyncStatus (directory = process.env.LDAP_DIRECTORY) {
 }
 
 // add provision info to database
-function createProvision(userId, username, data) {
-  const dbData = {...data, userId, username}
-  db.upsert('toolbox', 'user.provision', {userId, username}, dbData)
+function createProvision(user, data) {
+  const upsertFilter = {
+    userId: user.id
+  }
+  const dbData = {
+    ...data,
+    userId: user.id,
+    username: user.username,
+    vpnUsername: user.vpnUsername,
+    email: user.email
+  }
+  db.upsert('toolbox', 'user.provision', upsertFilter, dbData)
   .then(results => {
     // successful?
     if (results.ok === 1) {
@@ -564,10 +573,16 @@ async function setConfig (userId, changes) {
 async function provision (user, password) {
   const userId = user.id
   // add provision info to database
-  await createProvision(userId, user.username, {
-    status: 'working',
-    cucmLdapSync: 'not started',
-    uccxUserSync: 'not started'
+  await createProvision({
+    userId,
+    username: user.username, 
+    vpnUsername: user.vpnUsername,
+    email: user.email,
+    data: {
+      status: 'working',
+      cucmLdapSync: 'not started',
+      uccxUserSync: 'not started'
+    }
   })
   // make sure cumulus.config object exists for this user
   createConfig(user)
